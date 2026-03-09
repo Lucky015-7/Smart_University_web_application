@@ -2,6 +2,14 @@
 
 IT3030 – Programming Applications and Frameworks
 
+
+
+## Dev container
+01. Press Ctrl + Shift + P (Windows/Linux) or Cmd + Shift + P (Mac).
+02. Type "Dev Containers: Reopen in Container".
+03. Hit Enter.
+
+
 ## Project Description
 
 Smart Campus Operations Hub is a web-based platform for managing university facilities, bookings, and maintenance incidents.
@@ -33,3 +41,17 @@ Authentication: OAuth 2.0 (Google Login)
 backend/
 frontend/
 docs/
+
+
+
+
+
+
+## for bugs
+
+If you ever find that your .mvn folder is missing or corrupted, you don't need to manually install files. You can "re-generate" the Maven Wrapper by running this command in the terminal inside your project directory:
+
+
+```bash
+mvn wrapper:wrapper
+```

@@ -1,0 +1,21 @@
+{
+	"name": "Frontend Dev Container",
+	"dockerComposeFile": [
+		"../../docker-compose.yml"
+	],
+	"service": "frontend",
+	// "workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}/frontend",
+	"workspaceFolder": "/app",
+	"shutdownAction": "stopCompose",
+    "remoteUser": "root",
+	"customizations": {
+		"vscode": {
+			"extensions": [
+				"dsznajder.es7-react-js-snippets",
+                "esbenp.prettier-vscode",
+                "bradlc.vscode-tailwindcss",
+                "streetsidesoftware.code-spell-checker"
+			]
+		}
+	}
+}

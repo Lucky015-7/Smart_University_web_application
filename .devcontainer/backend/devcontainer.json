@@ -1,0 +1,31 @@
+{
+	"name": "Backend Dev Container",
+	"dockerComposeFile": [
+		"../../docker-compose.yml"
+	],
+	"service": "backend",
+	// "workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}/backend",
+	"workspaceFolder": "/app",
+	"shutdownAction": "stopCompose",
+    "remoteUser": "root",
+	"customizations": {
+		"vscode": {
+			"extensions": [
+				// "vscjava.vscode-java-pack",
+				// "vmware.vscode-boot-dev-pack",
+				"redhat.java",
+				"vscjava.vscode-maven",
+				"vscjava.vscode-gradle",
+				"vscjava.vscode-java-dependency",
+				"vscjava.vscode-java-debug",
+				"vscjava.vscode-java-test",
+				"vmware.vscode-spring-boot",
+				"vscjava.vscode-spring-initializr",
+				"vscjava.vscode-spring-boot-dashboard",
+				"ms-mssql.mssql",
+                "esbenp.prettier-vscode",
+                "streetsidesoftware.code-spell-checker"
+			]
+		}
+	}
+}
