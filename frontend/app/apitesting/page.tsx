@@ -78,11 +78,12 @@ import React, { useEffect, useState } from 'react'
 import { getBaseUrl } from '@/lib/api-client';
 
 const page = () => {
-    const [apiResponse, setApiResponse] = useState(null);
+    const [apiResponse, setApiResponse] = useState<string | null>(null);
     useEffect(() => {
         const fetchAPI = async () => {
-            const response = await fetch(`${getBaseUrl()}/actuator/health`);
-            const data = await response.json();
+            const response = await fetch(`${getBaseUrl()}/health`);
+            // const data = await response.json();
+            const data = await response.text();
             setApiResponse(data);
         };
         fetchAPI();
@@ -92,7 +93,7 @@ const page = () => {
     return (
         <div>
             <h1 className='text-2xl'>API Health Check</h1>
-            {/* <p>{apiResponse}</p> */}
+            <p>{apiResponse}</p>
         </div>
     )
 }

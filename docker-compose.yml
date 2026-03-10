@@ -56,8 +56,10 @@ services:
     environment:
       - NEXT_PUBLIC_API_URL=http://localhost:8080
       - INTERNAL_API_URL=http://backend:8080
-      - WATCHPACK_POLLING=1000
       - CHOKIDAR_USEPOLLING=true
+      - WATCHPACK_POLLING=true
+      # - WATCHPACK_POLLING=1000
+      # - CHOKIDAR_USEPOLLING=true
     networks:
       - PAF_project_network
     depends_on:
