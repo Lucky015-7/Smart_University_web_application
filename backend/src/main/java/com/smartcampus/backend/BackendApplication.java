@@ -14,9 +14,10 @@ public class BackendApplication {
 		SpringApplication.run(BackendApplication.class, args);
 	}
 
-	@GetMapping("/")
+	// do not delete this part yet. front container is depending on this
+	@GetMapping("/health")
 	public String healthCheck() {
-		String message = "Hello World!";
+		String message = "This is a Health Check";
 		return message;
 	}
 	

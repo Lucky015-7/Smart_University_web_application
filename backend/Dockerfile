@@ -3,7 +3,7 @@ WORKDIR /app
 
 # Install necessary utilities
 RUN --mount=type=cache,target=/var/cache/yum \
-    dnf install -y findutils && \
+    dnf install -y findutils curl && \
     dnf clean all
 
 COPY .mvn/ .mvn/
