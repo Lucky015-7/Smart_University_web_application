@@ -1,10 +1,15 @@
 package com.smartcampus.backend;
 
+import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.Bean;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.GetMapping;
 
+import com.smartcampus.backend.model.TestEntity;
+import com.smartcampus.backend.repository.TestRepository;
+
+import org.springframework.web.bind.annotation.GetMapping;
 
 @SpringBootApplication
 @RestController
@@ -20,6 +25,16 @@ public class BackendApplication {
 		String message = "This is a Health Check";
 		return message;
 	}
-	
+
+	// This runs automatically when the app starts
+	// @Bean
+	// CommandLineRunner initDatabase(TestRepository repository) {
+	// 	return args -> {
+	// 		if (repository.count() == 0) {
+	// 			repository.save(new TestEntity("Sample Data 1"));
+	// 			System.out.println("Initial data saved!");
+	// 		}
+	// 	};
+	// }
 
 }

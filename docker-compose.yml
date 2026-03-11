@@ -18,6 +18,22 @@ services:
       retries: 5
       start_period: 20s
 
+  db-init:
+    image: mcr.microsoft.com/mssql/server:2025-latest
+    container_name: smart_campus_db_init
+    restart: "no"
+    user: root
+    depends_on:
+      database:
+        condition: service_healthy
+    volumes:
+      - ./init.sql:/init.sql
+    networks:
+      - PAF_project_network
+    # This command runs the script and exits immediately after
+    entrypoint: /bin/bash -c "/opt/mssql-tools18/bin/sqlcmd -S database -U sa -P 'SuperSecretPassw0rd!' -C -i /init.sql"
+  
+
   backend:
     build:
       context: ./backend
@@ -28,8 +44,8 @@ services:
       - ./backend:/app
       - smart_campus_maven_repo:/root/.m2
     environment:
-      # - SPRING_DATASOURCE_URL=jdbc:sqlserver://database:1433;databaseName=smart_campus_v1;encrypt=true;trustServerCertificate=true
-      - SPRING_DATASOURCE_URL=jdbc:sqlserver://database:1433;databaseName=master;encrypt=true;trustServerCertificate=true
+      - SPRING_DATASOURCE_URL=jdbc:sqlserver://database:1433;databaseName=smart_campus_v1;encrypt=true;trustServerCertificate=true
+      # - SPRING_DATASOURCE_URL=jdbc:sqlserver://database:1433;databaseName=master;encrypt=true;trustServerCertificate=true
       - SPRING_DATASOURCE_USERNAME=sa
       - SPRING_DATASOURCE_PASSWORD=SuperSecretPassw0rd!
     networks:
