@@ -34,6 +34,8 @@ public class SecurityConfig {
             )
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/actuator/health", "/health").permitAll() // is this is not here the backend container will fail to start, because every other api will block by this security config
+                // .requestMatchers("/actuator/health").permitAll() // is this is not here the backend container will fail to start, because every other api will block by this security config
+                // .requestMatchers("/health").hasRole("ADMIN")
                 .requestMatchers("/api/admin/**").hasRole("ADMIN")
                 .requestMatchers("/api/technician/**").hasRole("TECHNICIAN")
                 .anyRequest().authenticated()

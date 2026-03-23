@@ -1,6 +1,7 @@
 package com.smartcampus.backend.controller;
 
 import java.util.Map;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -45,7 +46,11 @@ public class AuthController {
         if(name == null) name = "Unknown User";
         if(email == null) email = "unknown@university.edu";
 
-        User user = userService.syncUser(auth0Id, name, email); //if user not in the db this add the user
+        List<String> roles = jwt.getClaimAsStringList("https://smartcampus.api/roles");
+        // System.out.println(roles);
+        User.Role role = resolveRole(roles);
+
+        User user = userService.syncUser(auth0Id, name, email, role); //if user not in the db this add/update the user
 
 
         return ResponseEntity.ok(Map.of(
@@ -61,6 +66,20 @@ public class AuthController {
                 "profile", Map.of("href", "/api/auth/me")
             )
         ));
+    }
+
+    private User.Role resolveRole(List<String> roles) {
+        if (roles == null || roles.isEmpty()) {
+            return User.Role.USER;
+        }
+
+        if (roles.contains("ADMIN")) {
+            return User.Role.ADMIN;
+        }
+        if (roles.contains("TECHNICIAN")) {
+            return User.Role.TECHNICIAN;
+        }
+        return User.Role.USER;
     }
 
 

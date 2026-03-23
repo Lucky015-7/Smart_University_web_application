@@ -1,10 +1,12 @@
+// proxy.ts
 import { auth0 } from "@/lib/auth0";
 
-export async function middleware(request: Request) {
+export async function proxy(request: Request) {
+  // Use the same auth0 helper, just inside the renamed 'proxy' function
   return await auth0.middleware(request);
 }
 
-// This tells Next.js to run Auth0 on all routes EXCEPT static files/images
+// The config/matcher stays exactly the same
 export const config = {
   matcher: [
     "/((?!_next/static|_next/image|favicon.ico|sitemap.xml|robots.txt).*)"

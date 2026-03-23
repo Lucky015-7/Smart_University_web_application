@@ -1,23 +1,30 @@
-import { Button } from "@/components/ui/button"
+import { auth0 } from '@/lib/auth0'
+import { redirect } from 'next/navigation';
 
+import React from 'react'
 
-// In your component
+const page = async () => {
+  const session = await auth0.getSession();
+  if (!session?.user) {
+    redirect('/auth/login')
+  }
 
-export default function Page() {
+  let accessToken = null
+
+  try {
+    const { token } = await auth0.getAccessToken();
+    accessToken = token;
+    console.log(accessToken)
+  } catch (error) {
+    console.error("Failed to sync with backend: ", error)
+  }
   return (
-    <div className="flex min-h-svh p-6">
-      <div className="flex max-w-md min-w-0 flex-col gap-4 text-sm leading-loose">
-        <div>
-          <h1 className="font-medium">Project ready!</h1>
-          <p>You may now add components and start building.</p>
-          <p>We&apos;ve already added the button component for you.</p>
-          <Button className="mt-2">Button</Button>
+    <div>
 
-        </div>
-        <div className="font-mono text-xs text-muted-foreground">
-          (Press <kbd>d</kbd> to toggle dark mode)
-        </div>
-      </div>
+      <h1>This is your token</h1>
+      <p>{accessToken}</p>
     </div>
   )
 }
+
+export default page
