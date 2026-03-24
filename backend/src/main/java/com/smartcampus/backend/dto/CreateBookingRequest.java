@@ -1,33 +1,32 @@
 package com.smartcampus.backend.dto;
 
-import java.time.Instant;
+import java.time.LocalDateTime;
 
-import jakarta.validation.constraints.Future;
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
-
+/**
+ * DTO for creating a booking request.
+ * Represents the incoming payload from the client.
+ */
 public class CreateBookingRequest {
-
-    @NotBlank(message = "resourceId is required")
     private String resourceId;
-
-    @NotNull(message = "startTime is required")
-    @Future(message = "startTime must be in the future")
-    private Instant startTime;
-
-    @NotNull(message = "endTime is required")
-    @Future(message = "endTime must be in the future")
-    private Instant endTime;
-
-    @NotBlank(message = "purpose is required")
-    @Size(max = 500, message = "purpose must be at most 500 characters")
+    private LocalDateTime startTime;
+    private LocalDateTime endTime;
     private String purpose;
-
-    @Min(value = 1, message = "expectedAttendees must be at least 1")
     private Integer expectedAttendees;
 
+    // Constructors
+    public CreateBookingRequest() {
+    }
+
+    public CreateBookingRequest(String resourceId, LocalDateTime startTime, LocalDateTime endTime,
+                               String purpose, Integer expectedAttendees) {
+        this.resourceId = resourceId;
+        this.startTime = startTime;
+        this.endTime = endTime;
+        this.purpose = purpose;
+        this.expectedAttendees = expectedAttendees;
+    }
+
+    // Getters and Setters
     public String getResourceId() {
         return resourceId;
     }
@@ -36,19 +35,19 @@ public class CreateBookingRequest {
         this.resourceId = resourceId;
     }
 
-    public Instant getStartTime() {
+    public LocalDateTime getStartTime() {
         return startTime;
     }
 
-    public void setStartTime(Instant startTime) {
+    public void setStartTime(LocalDateTime startTime) {
         this.startTime = startTime;
     }
 
-    public Instant getEndTime() {
+    public LocalDateTime getEndTime() {
         return endTime;
     }
 
-    public void setEndTime(Instant endTime) {
+    public void setEndTime(LocalDateTime endTime) {
         this.endTime = endTime;
     }
 

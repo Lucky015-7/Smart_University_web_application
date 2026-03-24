@@ -1,34 +1,30 @@
 package com.smartcampus.backend.dto;
 
-import java.util.Map;
-
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-@JsonInclude(JsonInclude.Include.NON_NULL)
-public class ApiResponse<T> {
+import java.util.HashMap;
+import java.util.Map;
 
+/**
+ * Generic API Response wrapper for all REST endpoints.
+ * Follows the specification structure with status, data, and _links.
+ */
+public class ApiResponse<T> {
     private String status;
     private T data;
-
     @JsonProperty("_links")
-    private Map<String, ApiLink> links;
+    private Map<String, Object> _links;
 
-    public ApiResponse() {
-    }
-
-    public ApiResponse(String status, T data, Map<String, ApiLink> links) {
+    public ApiResponse(String status, T data) {
         this.status = status;
         this.data = data;
-        this.links = links;
+        this._links = new HashMap<>();
     }
 
-    public static <T> ApiResponse<T> success(T data, Map<String, ApiLink> links) {
-        return new ApiResponse<>("success", data, links);
-    }
-
-    public static <T> ApiResponse<T> error(T data) {
-        return new ApiResponse<>("error", data, null);
+    public ApiResponse(String status, T data, Map<String, Object> links) {
+        this.status = status;
+        this.data = data;
+        this._links = links;
     }
 
     public String getStatus() {
@@ -47,11 +43,15 @@ public class ApiResponse<T> {
         this.data = data;
     }
 
-    public Map<String, ApiLink> getLinks() {
-        return links;
+    public Map<String, Object> get_links() {
+        return _links;
     }
 
-    public void setLinks(Map<String, ApiLink> links) {
-        this.links = links;
+    public void set_links(Map<String, Object> _links) {
+        this._links = _links;
+    }
+
+    public void addLink(String rel, Map<String, String> link) {
+        this._links.put(rel, link);
     }
 }

@@ -1,88 +1,73 @@
 package com.smartcampus.backend.model;
 
-import java.time.Instant;
+import jakarta.persistence.*;
+import java.time.LocalDateTime;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.PrePersist;
-import jakarta.persistence.PreUpdate;
-import jakarta.persistence.Table;
-
+/**
+ * Booking Entity - Represents a resource booking request.
+ * Status can be: PENDING, APPROVED, REJECTED, CANCELLED
+ */
 @Entity
-@Table(name = "bookings")
+@Table(name = "Bookings")
 public class Booking {
-
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private String id;
 
-    @Column(unique = true)
-    private String bookingCode;
-
-    @Column(nullable = false)
+    @Column(name = "ResourceId", nullable = false)
     private String resourceId;
 
-    @Column(nullable = false)
+    @Column(name = "UserId", nullable = false)
     private String userId;
 
-    @Column(nullable = false)
-    private Instant startTime;
+    @Column(name = "StartTime", nullable = false)
+    private LocalDateTime startTime;
 
-    @Column(nullable = false)
-    private Instant endTime;
+    @Column(name = "EndTime", nullable = false)
+    private LocalDateTime endTime;
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private BookingStatus status;
-
-    @Column(nullable = false, length = 500)
+    @Column(name = "Purpose", nullable = false, length = 255)
     private String purpose;
 
+    @Column(name = "ExpectedAttendees")
     private Integer expectedAttendees;
 
-    @Column(length = 500)
+    @Column(name = "Status", nullable = false, length = 20)
+    private String status = "PENDING"; // PENDING, APPROVED, REJECTED, CANCELLED
+
+    @Column(name = "Reason", length = 255)
     private String reason;
 
-    @Column(nullable = false, updatable = false)
-    private Instant createdAt;
+    @Column(name = "CreatedAt", nullable = false)
+    private LocalDateTime createdAt;
 
-    @Column(nullable = false)
-    private Instant updatedAt;
+    @Column(name = "UpdatedAt", nullable = false)
+    private LocalDateTime updatedAt;
 
-    @PrePersist
-    public void onCreate() {
-        Instant now = Instant.now();
-        this.createdAt = now;
-        this.updatedAt = now;
-        if (this.status == null) {
-            this.status = BookingStatus.PENDING;
-        }
+    // Constructors
+    public Booking() {
     }
 
-    @PreUpdate
-    public void onUpdate() {
-        this.updatedAt = Instant.now();
+    public Booking(String id, String resourceId, String userId, LocalDateTime startTime,
+                   LocalDateTime endTime, String purpose, Integer expectedAttendees) {
+        this.id = id;
+        this.resourceId = resourceId;
+        this.userId = userId;
+        this.startTime = startTime;
+        this.endTime = endTime;
+        this.purpose = purpose;
+        this.expectedAttendees = expectedAttendees;
+        this.status = "PENDING";
+        this.createdAt = LocalDateTime.now();
+        this.updatedAt = LocalDateTime.now();
     }
 
-    public Long getId() {
+    // Getters and Setters
+    public String getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(String id) {
         this.id = id;
-    }
-
-    public String getBookingCode() {
-        return bookingCode;
-    }
-
-    public void setBookingCode(String bookingCode) {
-        this.bookingCode = bookingCode;
     }
 
     public String getResourceId() {
@@ -101,28 +86,20 @@ public class Booking {
         this.userId = userId;
     }
 
-    public Instant getStartTime() {
+    public LocalDateTime getStartTime() {
         return startTime;
     }
 
-    public void setStartTime(Instant startTime) {
+    public void setStartTime(LocalDateTime startTime) {
         this.startTime = startTime;
     }
 
-    public Instant getEndTime() {
+    public LocalDateTime getEndTime() {
         return endTime;
     }
 
-    public void setEndTime(Instant endTime) {
+    public void setEndTime(LocalDateTime endTime) {
         this.endTime = endTime;
-    }
-
-    public BookingStatus getStatus() {
-        return status;
-    }
-
-    public void setStatus(BookingStatus status) {
-        this.status = status;
     }
 
     public String getPurpose() {
@@ -141,6 +118,14 @@ public class Booking {
         this.expectedAttendees = expectedAttendees;
     }
 
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
     public String getReason() {
         return reason;
     }
@@ -149,19 +134,19 @@ public class Booking {
         this.reason = reason;
     }
 
-    public Instant getCreatedAt() {
+    public LocalDateTime getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(Instant createdAt) {
+    public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
     }
 
-    public Instant getUpdatedAt() {
+    public LocalDateTime getUpdatedAt() {
         return updatedAt;
     }
 
-    public void setUpdatedAt(Instant updatedAt) {
+    public void setUpdatedAt(LocalDateTime updatedAt) {
         this.updatedAt = updatedAt;
     }
 }

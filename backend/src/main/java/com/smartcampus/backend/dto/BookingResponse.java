@@ -1,23 +1,45 @@
 package com.smartcampus.backend.dto;
 
-import java.time.Instant;
+import java.time.LocalDateTime;
 
-import com.smartcampus.backend.model.BookingStatus;
-
+/**
+ * DTO for booking response.
+ * Represents the booking data returned to the client.
+ */
 public class BookingResponse {
-
     private String id;
     private String resourceId;
     private String userId;
-    private Instant startTime;
-    private Instant endTime;
-    private BookingStatus status;
+    private LocalDateTime startTime;
+    private LocalDateTime endTime;
     private String purpose;
     private Integer expectedAttendees;
+    private String status;
     private String reason;
-    private Instant createdAt;
-    private Instant updatedAt;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
 
+    // Constructors
+    public BookingResponse() {
+    }
+
+    public BookingResponse(String id, String resourceId, String userId, LocalDateTime startTime,
+                           LocalDateTime endTime, String purpose, Integer expectedAttendees,
+                           String status, String reason, LocalDateTime createdAt, LocalDateTime updatedAt) {
+        this.id = id;
+        this.resourceId = resourceId;
+        this.userId = userId;
+        this.startTime = startTime;
+        this.endTime = endTime;
+        this.purpose = purpose;
+        this.expectedAttendees = expectedAttendees;
+        this.status = status;
+        this.reason = reason;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
+    }
+
+    // Getters and Setters
     public String getId() {
         return id;
     }
@@ -42,28 +64,20 @@ public class BookingResponse {
         this.userId = userId;
     }
 
-    public Instant getStartTime() {
+    public LocalDateTime getStartTime() {
         return startTime;
     }
 
-    public void setStartTime(Instant startTime) {
+    public void setStartTime(LocalDateTime startTime) {
         this.startTime = startTime;
     }
 
-    public Instant getEndTime() {
+    public LocalDateTime getEndTime() {
         return endTime;
     }
 
-    public void setEndTime(Instant endTime) {
+    public void setEndTime(LocalDateTime endTime) {
         this.endTime = endTime;
-    }
-
-    public BookingStatus getStatus() {
-        return status;
-    }
-
-    public void setStatus(BookingStatus status) {
-        this.status = status;
     }
 
     public String getPurpose() {
@@ -82,6 +96,14 @@ public class BookingResponse {
         this.expectedAttendees = expectedAttendees;
     }
 
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
     public String getReason() {
         return reason;
     }
@@ -90,19 +112,19 @@ public class BookingResponse {
         this.reason = reason;
     }
 
-    public Instant getCreatedAt() {
+    public LocalDateTime getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(Instant createdAt) {
+    public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
     }
 
-    public Instant getUpdatedAt() {
+    public LocalDateTime getUpdatedAt() {
         return updatedAt;
     }
 
-    public void setUpdatedAt(Instant updatedAt) {
+    public void setUpdatedAt(LocalDateTime updatedAt) {
         this.updatedAt = updatedAt;
     }
 }
