@@ -14,6 +14,7 @@ import org.springframework.security.oauth2.core.DelegatingOAuth2TokenValidator;
 import org.springframework.security.oauth2.core.OAuth2Error;
 import org.springframework.security.oauth2.core.OAuth2TokenValidator;
 import org.springframework.security.oauth2.core.OAuth2TokenValidatorResult;
+import org.springframework.security.oauth2.jose.jws.SignatureAlgorithm;
 
 @Configuration
 @EnableWebSecurity
@@ -25,8 +26,15 @@ public class SecurityConfig {
     @Value("${spring.security.oauth2.resourceserver.jwt.issuer-uri}")
     private String issuerUri;
 
+    @Value("${spring.security.oauth2.resourceserver.jwt.jwk-set-uri:}")
+    private String jwkSetUri;
+
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain securityFilterChain(
+            HttpSecurity http, 
+            JwtDecoder jwtDecoder, 
+            JwtAuthenticationConverter jwtAuthenticationConverter) throws Exception {
+                
         http
             .csrf(csrf -> csrf.disable())
             .sessionManagement(session -> session
@@ -42,8 +50,8 @@ public class SecurityConfig {
             )
             .oauth2ResourceServer(oauth2 -> oauth2
                 .jwt(jwt -> jwt
-                    .decoder(jwtDecoder())
-                    .jwtAuthenticationConverter(jwtAuthenticationConverter())
+                    .decoder(jwtDecoder) // Use the injected parameter
+                    .jwtAuthenticationConverter(jwtAuthenticationConverter) // Use the injected parameter
                 )
             );
 
@@ -52,7 +60,14 @@ public class SecurityConfig {
 
     @Bean
     public JwtDecoder jwtDecoder() {
-        NimbusJwtDecoder decoder = JwtDecoders.fromIssuerLocation(issuerUri);
+        String normalizedIssuer = normalizeIssuer(issuerUri);
+        String resolvedJwkSetUri = (jwkSetUri == null || jwkSetUri.isBlank())
+            ? normalizedIssuer + ".well-known/jwks.json"
+            : jwkSetUri.trim();
+
+        NimbusJwtDecoder decoder = NimbusJwtDecoder.withJwkSetUri(resolvedJwkSetUri)
+            .jwsAlgorithm(SignatureAlgorithm.RS256)
+            .build();
 
         OAuth2TokenValidator<Jwt> audienceValidator = token ->
             token.getAudience().contains(audience)
@@ -60,13 +75,26 @@ public class SecurityConfig {
                 : OAuth2TokenValidatorResult.failure(
                     new OAuth2Error("invalid_token", "Invalid audience", null));
 
-        OAuth2TokenValidator<Jwt> withIssuer = JwtValidators.createDefaultWithIssuer(issuerUri);
+        OAuth2TokenValidator<Jwt> withIssuer = JwtValidators.createDefaultWithIssuer(normalizedIssuer);
         OAuth2TokenValidator<Jwt> combined =
             new DelegatingOAuth2TokenValidator<>(withIssuer, audienceValidator);
 
         decoder.setJwtValidator(combined);
         return decoder;
     }
+
+    private String normalizeIssuer(String issuer) {
+        if (issuer == null) {
+            return null;
+        }
+
+        String normalized = issuer.trim();
+        while (normalized.endsWith("/")) {
+            normalized = normalized.substring(0, normalized.length() - 1);
+        }
+        return normalized + "/";
+    }
+
 
     @Bean
     public JwtAuthenticationConverter jwtAuthenticationConverter() {
