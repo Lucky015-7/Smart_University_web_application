@@ -1,4 +1,5 @@
-FROM container-registry.oracle.com/java/openjdk:25.0.2
+FROM container-registry.oracle.com/java/openjdk:25
+# FROM container-registry.oracle.com/java/openjdk:25.0.2
 WORKDIR /app
 
 # Install necessary utilities
@@ -17,4 +18,5 @@ RUN --mount=type=cache,target=/root/.m2 \
 COPY src ./src
 
 EXPOSE 8080
-CMD ["./mvnw", "spring-boot:run"]
+# CMD ["./mvnw", "spring-boot:run"]
+CMD ["./mvnw", "clean", "spring-boot:run"]
