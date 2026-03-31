@@ -4,6 +4,8 @@ import "./globals.css"
 import { ThemeProvider } from "@/components/theme-provider"
 import { cn } from "@/lib/utils";
 import { Auth0Provider } from '@auth0/nextjs-auth0/client';
+import { AuthProvider } from "@/lib/auth-context";
+import { NavigationBar } from "@/components/custom/NavigationBar";
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-sans' })
 
@@ -25,7 +27,12 @@ export default function RootLayout({
     >
       <body>
         <Auth0Provider>
-          <ThemeProvider>{children}</ThemeProvider>
+          <AuthProvider>
+            <ThemeProvider>
+              <NavigationBar/>
+              {children}
+            </ThemeProvider>
+          </AuthProvider>
         </Auth0Provider>
       </body>
     </html>
