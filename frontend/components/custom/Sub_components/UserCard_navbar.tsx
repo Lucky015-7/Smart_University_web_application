@@ -31,7 +31,11 @@ export const UserCard_navbar = () => {
         loading,
         error
     } = useAuth();
-
+    const router = useRouter()
+    const handleProfileClick = () =>{
+        router.push("/user/profile")
+    }
+    
     let avatar_image = "https://images.pexels.com/photos/2103864/pexels-photo-2103864.jpeg"
     let avatar_image_alt = name ?? "Unknown User";
     const userName = name ?? "Unknown User";
@@ -57,10 +61,6 @@ export const UserCard_navbar = () => {
         return <div className="text-sm text-red-500">!!!</div>;
     }
 
-        const router = useRouter()
-        const handleProfileClick = () =>{
-            router.push("/user/profile")
-        }
 
     return (
         <div className="flex items-center justify-center">
