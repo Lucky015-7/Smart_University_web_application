@@ -121,6 +121,54 @@ public class ResourceService {
         resourceRepository.deleteById(resourceId);
     }
 
+        public ListResourcesResponse listResources(String type, String status, Integer minCapacity, int page, int limit) {
+        int validatedPage = Math.max(page, 1);
+        int validatedLimit = Math.max(limit, 1);
+        
+        List<Resource> resources;
+        
+        // Apply filters
+        if (type != null && !type.isEmpty() && status != null && !status.isEmpty() && minCapacity != null) {
+            resources = resourceRepository.findByTypeAndMinCapacity(type, minCapacity)
+                .stream()
+                .filter(r -> status.equals(r.getStatus()))
+                .collect(Collectors.toList());
+        } else if (type != null && !type.isEmpty() && status != null && !status.isEmpty()) {
+            resources = resourceRepository.findByTypeAndStatus(type, status);
+        } else if (type != null && !type.isEmpty() && minCapacity != null) {
+            resources = resourceRepository.findByTypeAndMinCapacity(type, minCapacity);
+        } else if (type != null && !type.isEmpty()) {
+            resources = resourceRepository.findByType(type);
+        } else if (status != null && !status.isEmpty()) {
+            resources = resourceRepository.findByStatus(status);
+        } else if (minCapacity != null) {
+            resources = resourceRepository.findByMinCapacity(minCapacity);
+        } else {
+            resources = resourceRepository.findAll();
+        }
+        
+        // Sort by name
+        resources.sort(Comparator.comparing(Resource::getName));
+        
+        // Calculate pagination
+        int total = resources.size();
+        int totalPages = total == 0 ? 0 : (int) Math.ceil((double) total / validatedLimit);
+        
+        // Apply pagination
+        int startIdx = (validatedPage - 1) * validatedLimit;
+        int endIdx = Math.min(startIdx + validatedLimit, total);
+
+        List<ResourceListItem> paginatedItems = startIdx >= total
+            ? Collections.emptyList()
+            : resources.subList(startIdx, endIdx)
+                .stream()
+                .map(this::convertToResourceListItem)
+                .collect(Collectors.toList());
+        
+        return new ListResourcesResponse(paginatedItems, total, validatedPage, totalPages);
+    }
+
+    
 
     // Helper Methods for Create
     private void validateResourceRequest(CreateResourceRequest request) {
@@ -185,4 +233,31 @@ public class ResourceService {
             resource.getCreatedAt()
         );
     }
+
+        /**
+     * Convert Resource entity to ResourceListItem DTO with HATEOAS links.
+     */
+    private ResourceListItem convertToResourceListItem(Resource resource) {
+        ResourceListItem item = new ResourceListItem(
+            resource.getId(),
+            resource.getName(),
+            resource.getType(),
+            resource.getCapacity(),
+            resource.getLocation(),
+            resource.getStatus()
+        );
+        
+        // Add HATEOAS links
+        Map<String, String> selfLink = new HashMap<>();
+        selfLink.put("href", "/api/resources/" + resource.getId());
+        item.addLink("self", selfLink);
+        
+        Map<String, String> bookLink = new HashMap<>();
+        bookLink.put("href", "/api/bookings");
+        bookLink.put("method", "POST");
+        item.addLink("book", bookLink);
+        
+        return item;
+    }
+
 }

@@ -29,6 +29,65 @@ public class ResourceController {
     @Autowired
     private ResourceService resourceService;
 
+        /**
+     * GET /api/resources
+     * List resources with optional filtering and pagination.
+     * 
+     * Query Parameters:
+     * - type: Filter by type (ROOM, LAB, EQUIPMENT)
+     * - status: Filter by status (ACTIVE, OUT_OF_SERVICE)
+     * - minCapacity: Filter by minimum capacity
+     * - page: Page number (1-indexed), default 1
+     * - limit: Items per page, default 10
+     * 
+     * Status Codes:
+     * - 200 OK: Successfully retrieved resources
+     */
+    @GetMapping
+    public ResponseEntity<ApiResponse<ListResourcesResponse>> listResources(
+        @RequestParam(value = "type", required = false) String type,
+        @RequestParam(value = "status", required = false) String status,
+        @RequestParam(value = "minCapacity", required = false) Integer minCapacity,
+        @RequestParam(value = "page", defaultValue = "1") int page,
+        @RequestParam(value = "limit", defaultValue = "10") int limit) {
+        
+        try {
+            ListResourcesResponse resources = resourceService.listResources(type, status, minCapacity, page, limit);
+            
+            // Build response with HATEOAS links
+            ApiResponse<ListResourcesResponse> response = new ApiResponse<>("success", resources);
+            
+            // Self link
+            String queryString = buildQueryString(type, status, minCapacity, resources.getPage(), limit);
+            response.addLink("self", createLink("/api/resources" + queryString));
+            
+            // Next link (if not on last page)
+            if (resources.getTotalPages() > 0 && resources.getPage() < resources.getTotalPages()) {
+                String nextQuery = buildQueryString(type, status, minCapacity, resources.getPage() + 1, limit);
+                response.addLink("next", createLink("/api/resources" + nextQuery));
+            }
+            
+            // Previous link (if not on first page)
+            if (resources.getPage() > 1) {
+                String prevQuery = buildQueryString(type, status, minCapacity, resources.getPage() - 1, limit);
+                response.addLink("prev", createLink("/api/resources" + prevQuery));
+            }
+            
+            return ResponseEntity
+                .ok()
+                .header("Cache-Control", "public, max-age=300")
+                .body(response);
+                
+        } catch (IllegalArgumentException e) {
+            ApiResponse<ListResourcesResponse> error = new ApiResponse<>("error", null);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+        } catch (Exception e) {
+            ApiResponse<ListResourcesResponse> error = new ApiResponse<>("error", null);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
+        }
+    }
+
+
     @PostMapping
     public ResponseEntity<ApiResponse<ResourceResponse>> createResource(@RequestBody CreateResourceRequest request) {
         try {
@@ -127,4 +186,36 @@ public class ResourceController {
         return link;
     }
 
+        /**
+     * Helper to build query string for pagination.
+     */
+    private String buildQueryString(String type, String status, Integer minCapacity, int page, int limit) {
+        StringBuilder sb = new StringBuilder("?");
+        boolean first = true;
+        
+        if (type != null && !type.isEmpty()) {
+            sb.append("type=").append(type);
+            first = false;
+        }
+        
+        if (status != null && !status.isEmpty()) {
+            if (!first) sb.append("&");
+            sb.append("status=").append(status);
+            first = false;
+        }
+        
+        if (minCapacity != null) {
+            if (!first) sb.append("&");
+            sb.append("minCapacity=").append(minCapacity);
+            first = false;
+        }
+        
+        if (!first) sb.append("&");
+        sb.append("page=").append(page).append("&limit=").append(limit);
+        
+        return sb.toString();
+    }
 }
+
+
+
