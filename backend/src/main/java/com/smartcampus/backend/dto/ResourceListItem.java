@@ -1,5 +1,7 @@
 package com.smartcampus.backend.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -11,6 +13,7 @@ public class ResourceListItem {
     private Integer capacity;
     private String location;
     private String status;
+    @JsonProperty("_links")
     private Map<String, Object> _links;
 
     // Constructors

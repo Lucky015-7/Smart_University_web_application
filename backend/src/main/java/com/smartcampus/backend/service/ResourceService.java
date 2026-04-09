@@ -250,11 +250,6 @@ public class ResourceService {
         selfLink.put("href", "/api/resources/" + resource.getId());
         item.addLink("self", selfLink);
         
-        Map<String, String> bookLink = new HashMap<>();
-        bookLink.put("href", "/api/bookings");
-        bookLink.put("method", "POST");
-        item.addLink("book", bookLink);
-        
         return item;
     }
 
