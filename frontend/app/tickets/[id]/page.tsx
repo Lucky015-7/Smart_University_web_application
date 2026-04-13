@@ -1,5 +1,6 @@
 "use client"
 import { ResourceView } from '@/components/custom/ResourceView'
+import { TicketForm } from '@/components/custom/TicketForm';
 import { useParams } from 'next/navigation';
 import React from 'react'
 
@@ -10,11 +11,11 @@ const page = () => {
     <main>
       <h1 className=' text-2xl'>Submit a ticket</h1>
       <section className='flex flex-row'>
-        <div className='basis-2/3'>
+        <div className='basis-2/5'>
           <ResourceView id={id} />
         </div>
-        <div className='basis-1/3'>
-          for the ticket form
+        <div className='basis-3/5'>
+          <TicketForm resourceId={id}/>
         </div>
       </section>
     </main>

@@ -104,7 +104,7 @@ public class MinioService {
         return uploadFile(userId, file, StorageFolder.TICKET);
     }
 
-    public String uploadFile(String userId, MultipartFile file, StorageFolder folder) {
+    public String uploadFile(String userId, MultipartFile file, String folder) {
         try {
             String generatedFileName = generateUniqueFileName(userId, file.getOriginalFilename());
             String objectKey = buildObjectKey(folder, generatedFileName);
@@ -129,6 +129,10 @@ public class MinioService {
         } catch (Exception e) {
             throw new RuntimeException("Failed to upload file to Minio: " + e.getMessage(), e);
         }
+    }
+
+    public String uploadFile(String userId, MultipartFile file, StorageFolder folder) {
+        return uploadFile(userId, file, folder == null ? null : folder.prefix());
     }
 
     /**
@@ -184,6 +188,32 @@ public class MinioService {
         return fileExists(buildObjectKey(folder, generatedFileName));
     }
 
+    public InputStream getFileStream(String objectKey) {
+        try {
+            return minioClient.getObject(
+                    GetObjectArgs.builder()
+                            .bucket(bucketName)
+                            .object(normalizeObjectKey(objectKey))
+                            .build()
+            );
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to retrieve file from Minio: " + e.getMessage(), e);
+        }
+    }
+
+    public String getFileContentType(String objectKey) {
+        try {
+            return minioClient.statObject(
+                    StatObjectArgs.builder()
+                            .bucket(bucketName)
+                            .object(normalizeObjectKey(objectKey))
+                            .build()
+            ).contentType();
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
     // ── Private helpers ───────────────────────────────────────────────────────
 
     /**
@@ -202,16 +232,65 @@ public class MinioService {
     }
 
     private String buildObjectKey(StorageFolder folder, String generatedFileName) {
+        return buildObjectKey(folder == null ? null : folder.prefix(), generatedFileName);
+    }
+
+    private String buildObjectKey(String folder, String generatedFileName) {
         String cleanFileName = generatedFileName;
         if (cleanFileName.startsWith("/")) {
             cleanFileName = cleanFileName.substring(1);
         }
 
-        if (cleanFileName.startsWith("tickets/") || cleanFileName.startsWith("resources/")) {
+        // If caller already passed a full object key, keep it unchanged.
+        if (cleanFileName.contains("/")) {
             return cleanFileName;
         }
 
-        StorageFolder target = folder == null ? StorageFolder.TICKET : folder;
-        return target.prefix() + "/" + cleanFileName;
+        String normalizedFolder = normalizeFolder(folder);
+        return normalizedFolder + "/" + cleanFileName;
+    }
+
+    private String normalizeObjectKey(String objectKey) {
+        if (objectKey == null || objectKey.isBlank()) {
+            throw new IllegalArgumentException("Object key cannot be empty");
+        }
+
+        String normalized = objectKey.trim().replace('\\', '/');
+        normalized = normalized.replaceAll("/+", "/");
+        normalized = normalized.replaceAll("^/+", "");
+
+        if (normalized.isBlank() || normalized.contains("..")) {
+            throw new IllegalArgumentException("Invalid object key");
+        }
+
+        return normalized;
+    }
+
+    private String normalizeFolder(String folder) {
+        if (folder == null || folder.isBlank()) {
+            return StorageFolder.TICKET.prefix();
+        }
+
+        String normalized = folder.trim().toLowerCase().replace('\\', '/');
+        normalized = normalized.replaceAll("/+", "/");
+        normalized = normalized.replaceAll("^/+", "").replaceAll("/+$", "");
+
+        if (normalized.isBlank()) {
+            return StorageFolder.TICKET.prefix();
+        }
+
+        // Backward-compatible mapping for existing API docs values.
+        if ("ticket".equals(normalized)) {
+            return StorageFolder.TICKET.prefix();
+        }
+        if ("resource".equals(normalized)) {
+            return StorageFolder.RESOURCE.prefix();
+        }
+
+        if (!normalized.matches("[a-z0-9][a-z0-9/_-]*") || normalized.contains("..")) {
+            throw new IllegalArgumentException("Invalid folder name");
+        }
+
+        return normalized;
     }
 }

@@ -555,9 +555,16 @@ public class TicketService {
                         c.getCreatedAt(), c.getUpdatedAt()))
                 .collect(Collectors.toList());
 
+        TicketResponse.ResourceInfo resourceInfo = null;
+        if (!isBlank(ticket.getResourceId())) {
+            resourceInfo = new TicketResponse.ResourceInfo(
+                ticket.getResourceId(),
+                "Resource " + ticket.getResourceId());
+        }
+
         return new TicketResponse(
                 ticket.getId(),
-                ticket.getResourceId(),
+            resourceInfo,
                 ticket.getLocation(),
                 ticket.getCategory(),
                 ticket.getPriority(),
@@ -576,9 +583,16 @@ public class TicketService {
 
     /** Converts a Ticket entity to a compact TicketListItem (no comments). */
     private TicketListItem convertToTicketListItem(Ticket ticket) {
+        TicketListItem.ResourceInfo resourceInfo = null;
+        if (!isBlank(ticket.getResourceId())) {
+            resourceInfo = new TicketListItem.ResourceInfo(
+                ticket.getResourceId(),
+                "Resource " + ticket.getResourceId());
+        }
+
         TicketListItem item = new TicketListItem(
                 ticket.getId(),
-                ticket.getResourceId(),
+            resourceInfo,
                 ticket.getLocation(),
                 ticket.getCategory(),
                 ticket.getPriority(),

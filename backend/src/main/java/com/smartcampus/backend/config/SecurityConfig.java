@@ -70,11 +70,12 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.DELETE, "/api/tickets/*/comments/*").authenticated()
 
                 .requestMatchers(HttpMethod.POST, "/api/upload").authenticated()
+                .requestMatchers(HttpMethod.GET, "/api/upload/view").authenticated()
                 .requestMatchers(HttpMethod.DELETE, "/api/upload/*").authenticated()
 
                 .requestMatchers(HttpMethod.POST, "/api/notifications").hasRole("ADMIN")
                 .requestMatchers("/api/notifications/**").authenticated()
-                .requestMatchers("/api/test/**", "/api/incidents/**").hasRole("ADMIN")
+                .requestMatchers("/api/test/**").hasRole("ADMIN")
 
                 .anyRequest().authenticated()
             )

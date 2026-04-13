@@ -61,7 +61,7 @@ interface ApiResponseProps {
 }
 
 export const MyBookings = () => {
-    const [resources, setResource] = useState<BookingResponseData[]>([]);
+    const [bookings, setBookings] = useState<BookingResponseData[]>([]);
     const [loading, setLoading] = useState(true);
     
     const router = useRouter();
@@ -78,12 +78,12 @@ export const MyBookings = () => {
                 })
                 const result: ApiResponseProps = await response.json();
                 if (result.status === "success") {
-                    setResource(result.data.items);
+                    setBookings(result.data.items);
                 }
 
             } catch (error) {
                 toast.warning("Something went wrong!")
-                console.error("Failed to fetch resource:", error);
+                console.error("Failed to fetch data:", error);
             } finally {
                 setLoading(false);
             }
@@ -91,7 +91,7 @@ export const MyBookings = () => {
         fetchData();
     }, []);
     if (loading) return <div><LoadingData/></div>;
-    if (!loading && resources.length === 0) return <div><EmptyData/></div>;
+    if (!loading && bookings.length === 0) return <div><EmptyData/></div>;
 
 
     // console.log(resources)

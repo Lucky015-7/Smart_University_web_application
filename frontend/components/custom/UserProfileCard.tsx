@@ -23,7 +23,7 @@ const userAccessLevel = "ADMIN"
 
 export const UserProfileCard = () => {
     return (
-        <main className='p-5 shadow-md rounded-lg h-[90lvh]'>
+        <main className='p-5 shadow-md rounded-lg h-full bg-card  '>
             <div className='max-w-md mx-auto'>
                 <div className='relative'>
                     <AspectRatio ratio={16 / 5} className="rounded-lg bg-muted overflow-hidden">

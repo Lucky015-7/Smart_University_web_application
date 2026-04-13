@@ -1,0 +1,38 @@
+import { auth0 } from '@/lib/auth0';
+import { NextRequest, NextResponse } from 'next/server';
+import { SERVER_API_URL } from '@/lib/api-client';
+
+export async function POST(request: NextRequest) {
+    try {
+        const session = await auth0.getSession();
+        if (!session?.user) {
+            return NextResponse.json(
+                { status: 'error', message: 'Not authenticated' },
+                { status: 401 }
+            );
+        }
+
+        const { token } = await auth0.getAccessToken();
+        const formData = await request.formData();
+
+        const backendRes = await fetch(`${SERVER_API_URL}/api/upload`, {
+            method: 'POST',
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+            body: formData,
+        });
+
+        const text = await backendRes.text();
+
+        return new NextResponse(text, {
+            status: backendRes.status,
+            headers: {
+                'Content-Type': backendRes.headers.get('content-type') || 'application/json',
+            },
+        });
+    } catch (error: unknown) {
+        const message = error instanceof Error ? error.message : 'Internal Server Error';
+        return NextResponse.json({ status: 'error', message }, { status: 500 });
+    }
+}

@@ -5,13 +5,17 @@ import com.smartcampus.backend.dto.ApiResponse;
 import com.smartcampus.backend.dto.FileUploadResponse;
 import com.smartcampus.backend.service.MinioService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.util.UriUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.http.MediaTypeFactory;
 
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -72,8 +76,6 @@ public class FileUploadController {
                         "Missing or invalid bearer token: user id (sub) claim not found");
             }
 
-            MinioService.StorageFolder storageFolder = resolveStorageFolder(folder);
-
             // ── Validation ────────────────────────────────────────────────────
 
             if (file == null || file.isEmpty()) {
@@ -98,7 +100,7 @@ public class FileUploadController {
 
             // ── Upload to Minio ───────────────────────────────────────────────
 
-            String generatedFileName = minioService.uploadFile(userId, file, storageFolder);
+            String generatedFileName = minioService.uploadFile(userId, file, folder);
 
             FileUploadResponse uploadResponse = new FileUploadResponse(
                     generatedFileName,
@@ -112,6 +114,7 @@ public class FileUploadController {
                     new ApiResponse<>("success", uploadResponse);
                 String encodedFileName = UriUtils.encode(generatedFileName, java.nio.charset.StandardCharsets.UTF_8);
                 response.addLink("self", createLink("/api/upload?fileName=" + encodedFileName));
+                response.addLink("view", createLink("/api/upload/view?fileName=" + encodedFileName));
                 response.addLink("delete", createLinkWithMethod("/api/upload?fileName=" + encodedFileName, "DELETE"));
 
             return ResponseEntity
@@ -178,6 +181,37 @@ public class FileUploadController {
         }
     }
 
+    @GetMapping(value = "/view", params = "fileName")
+    public ResponseEntity<?> viewFile(@RequestParam("fileName") String fileName) {
+        try {
+            if (fileName == null || fileName.isBlank()) {
+                return ResponseEntity.badRequest().body("fileName is required");
+            }
+
+            InputStream stream = minioService.getFileStream(fileName);
+            String minioContentType = minioService.getFileContentType(fileName);
+
+            MediaType mediaType = MediaTypeFactory.getMediaType(fileName)
+                    .orElse(MediaType.APPLICATION_OCTET_STREAM);
+            if (minioContentType != null && !minioContentType.isBlank()) {
+                try {
+                    mediaType = MediaType.parseMediaType(minioContentType);
+                } catch (Exception ignored) {
+                    // Fall back to extension-based detection.
+                }
+            }
+
+            return ResponseEntity.ok()
+                    .contentType(mediaType)
+                    .body(new InputStreamResource(stream));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body("File not found: " + e.getMessage());
+        }
+    }
+
     // ── Helpers ───────────────────────────────────────────────────────────────
 
     private Map<String, String> createLink(String href) {
@@ -200,18 +234,4 @@ public class FileUploadController {
         return ResponseEntity.status(status).body(error);
     }
 
-    private MinioService.StorageFolder resolveStorageFolder(String folder) {
-        if (folder == null || folder.isBlank()) {
-            return MinioService.StorageFolder.TICKET;
-        }
-
-        if ("resource".equalsIgnoreCase(folder)) {
-            return MinioService.StorageFolder.RESOURCE;
-        }
-        if ("ticket".equalsIgnoreCase(folder)) {
-            return MinioService.StorageFolder.TICKET;
-        }
-
-        throw new IllegalArgumentException("Invalid folder. Use 'ticket' or 'resource'");
-    }
 }
