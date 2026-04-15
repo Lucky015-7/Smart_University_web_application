@@ -14,7 +14,7 @@ import java.util.Map;
 public class TicketListItem {
 
     private String id;
-    private String resourceId;
+    private ResourceInfo resource;
     private String location;
     private String category;
     private String priority;
@@ -27,16 +27,34 @@ public class TicketListItem {
     @JsonProperty("_links")
     private Map<String, Object> links = new HashMap<>();
 
+    public static class ResourceInfo {
+        private String id;
+        private String name;
+
+        public ResourceInfo() {}
+
+        public ResourceInfo(String id, String name) {
+            this.id = id;
+            this.name = name;
+        }
+
+        public String getId() { return id; }
+        public void setId(String id) { this.id = id; }
+
+        public String getName() { return name; }
+        public void setName(String name) { this.name = name; }
+    }
+
     // ── Constructor ───────────────────────────────────────────────────────────
 
     public TicketListItem() {}
 
-    public TicketListItem(String id, String resourceId, String location,
+    public TicketListItem(String id, ResourceInfo resource, String location,
                           String category, String priority, String status,
                           String createdBy, String assignedTo,
                           LocalDateTime createdAt, LocalDateTime updatedAt) {
         this.id         = id;
-        this.resourceId = resourceId;
+        this.resource   = resource;
         this.location   = location;
         this.category   = category;
         this.priority   = priority;
@@ -56,8 +74,8 @@ public class TicketListItem {
     public String getId() { return id; }
     public void setId(String id) { this.id = id; }
 
-    public String getResourceId() { return resourceId; }
-    public void setResourceId(String resourceId) { this.resourceId = resourceId; }
+    public ResourceInfo getResource() { return resource; }
+    public void setResource(ResourceInfo resource) { this.resource = resource; }
 
     public String getLocation() { return location; }
     public void setLocation(String location) { this.location = location; }

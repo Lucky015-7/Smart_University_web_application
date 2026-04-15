@@ -61,7 +61,7 @@ interface ApiResponseProps {
 }
 
 export const MyBookings = () => {
-    const [resources, setResource] = useState<BookingResponseData[]>([]);
+    const [bookings, setBookings] = useState<BookingResponseData[]>([]);
     const [loading, setLoading] = useState(true);
     
     const router = useRouter();
@@ -78,12 +78,12 @@ export const MyBookings = () => {
                 })
                 const result: ApiResponseProps = await response.json();
                 if (result.status === "success") {
-                    setResource(result.data.items);
+                    setBookings(result.data.items);
                 }
 
             } catch (error) {
                 toast.warning("Something went wrong!")
-                console.error("Failed to fetch resource:", error);
+                console.error("Failed to fetch data:", error);
             } finally {
                 setLoading(false);
             }
@@ -91,7 +91,7 @@ export const MyBookings = () => {
         fetchData();
     }, []);
     if (loading) return <div><LoadingData/></div>;
-    if (!loading && resources.length === 0) return <div><EmptyData/></div>;
+    if (!loading && bookings.length === 0) return <div><EmptyData/></div>;
 
 
     // console.log(resources)
@@ -118,13 +118,13 @@ export const MyBookings = () => {
                     </TableRow>
                 </TableHeader>
                 <TableBody>
-                    {resources.map((resource) => (
-                        <TableRow key={resource.id}>
-                            <TableCell className="font-medium cursor-pointer underline hover:translate-x-1" onClick={()=>router.push(`/resources/${resource.resource.id}`)}>{resource.resource.name}</TableCell>
-                            <TableCell>{resource.startTime}</TableCell>
-                            <TableCell>{resource.endTime}</TableCell>
-                            <TableCell>{resource.status}</TableCell>
-                            <TableCell hidden={resource.status !== "PENDING"}>
+                    {bookings.map((booking) => (
+                        <TableRow key={booking.id}>
+                            <TableCell className="font-medium cursor-pointer underline hover:translate-x-1" onClick={()=>router.push(`/resources/${booking.resource.id}`)}>{booking.resource.name}</TableCell>
+                            <TableCell>{booking.startTime}</TableCell>
+                            <TableCell>{booking.endTime}</TableCell>
+                            <TableCell>{booking.status}</TableCell>
+                            <TableCell hidden={booking.status !== "PENDING"}>
                                 <DropdownMenu>
                                     <DropdownMenuTrigger asChild>
                                         <Button variant="ghost" size="icon" className="size-8">

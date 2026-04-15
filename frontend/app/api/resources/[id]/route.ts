@@ -1,5 +1,5 @@
 import { auth0 } from '@/lib/auth0';
-import { SERVER_API_URL } from '@/lib/api-client';
+import { getBaseUrl, SERVER_API_URL } from '@/lib/api-client';
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function GET(
@@ -16,10 +16,12 @@ export async function GET(
 		}
 
 		const { token } = await auth0.getAccessToken();
+		
 		const { id } = await params;
 
+		const Api_Url = getBaseUrl();
 		const backendRes = await fetch(
-			`${SERVER_API_URL}/api/resources/${encodeURIComponent(id)}`,
+			`${Api_Url}/api/resources/${encodeURIComponent(id)}`,
 			{
 				method: 'GET',
 				headers: {

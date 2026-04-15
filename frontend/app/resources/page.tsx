@@ -18,7 +18,7 @@ import { Input } from "@/components/ui/input"
 import { EmptyData } from '@/components/custom/EmptyData';
 import { LoadingData } from '@/components/custom/LoadingData';
 
-export interface Resource {
+interface Resource {
     id: string;
     name: string;
     type: string;
@@ -30,7 +30,7 @@ export interface Resource {
     };
 }
 
-export interface ResourceResponse {
+interface ResourceResponse {
     _links: any;
     data: {
         items: Resource[];

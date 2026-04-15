@@ -116,7 +116,7 @@ export const BookingForm = ({ id }: { id: string }) => {
           // Keep fallback message when response body is not JSON.
         }
 
-        throw new Error(message);
+        // throw new Error(message);
       }
 
       toast.success("Booking created successfully!");
@@ -320,9 +320,9 @@ export const BookingForm = ({ id }: { id: string }) => {
           <FieldSeparator />
           <Field orientation="horizontal">
             <Button type="submit">Submit</Button>
-            <Button variant="outline" type="button">
+            {/* <Button variant="outline" type="button">
               Cancel
-            </Button>
+            </Button> */}
           </Field>
         </FieldGroup>
       </form >

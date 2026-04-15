@@ -7,6 +7,7 @@ import com.smartcampus.backend.model.TicketComment;
 import com.smartcampus.backend.repository.TicketAttachmentRepository;
 import com.smartcampus.backend.repository.TicketCommentRepository;
 import com.smartcampus.backend.repository.TicketRepository;
+import com.smartcampus.backend.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -38,6 +39,9 @@ public class TicketService {
 
     @Autowired
     private TicketCommentRepository commentRepository;
+
+    @Autowired
+    private UserRepository userRepository;
 
     @Autowired
     private MinioService minioService;
@@ -555,9 +559,16 @@ public class TicketService {
                         c.getCreatedAt(), c.getUpdatedAt()))
                 .collect(Collectors.toList());
 
+        TicketResponse.ResourceInfo resourceInfo = null;
+        if (!isBlank(ticket.getResourceId())) {
+            resourceInfo = new TicketResponse.ResourceInfo(
+                ticket.getResourceId(),
+                "Resource " + ticket.getResourceId());
+        }
+
         return new TicketResponse(
                 ticket.getId(),
-                ticket.getResourceId(),
+            resourceInfo,
                 ticket.getLocation(),
                 ticket.getCategory(),
                 ticket.getPriority(),
@@ -576,9 +587,16 @@ public class TicketService {
 
     /** Converts a Ticket entity to a compact TicketListItem (no comments). */
     private TicketListItem convertToTicketListItem(Ticket ticket) {
+        TicketListItem.ResourceInfo resourceInfo = null;
+        if (!isBlank(ticket.getResourceId())) {
+            resourceInfo = new TicketListItem.ResourceInfo(
+                ticket.getResourceId(),
+                "Resource " + ticket.getResourceId());
+        }
+
         TicketListItem item = new TicketListItem(
                 ticket.getId(),
-                ticket.getResourceId(),
+            resourceInfo,
                 ticket.getLocation(),
                 ticket.getCategory(),
                 ticket.getPriority(),
@@ -603,10 +621,16 @@ public class TicketService {
 
     /** Converts a TicketComment entity to a TicketCommentResponse. */
     private TicketCommentResponse convertToCommentResponse(TicketComment comment) {
+        // Fetch author name from User repository
+        String authorName = userRepository.findById(comment.getAuthorId())
+                .map(user -> user.getName())
+                .orElse("Unknown User");
+        
         return new TicketCommentResponse(
                 comment.getId(),
                 comment.getTicketId(),
                 comment.getAuthorId(),
+                authorName,
                 comment.getText(),
                 comment.getCreatedAt(),
                 comment.getUpdatedAt()

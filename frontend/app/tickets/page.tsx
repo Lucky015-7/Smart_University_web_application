@@ -1,8 +1,11 @@
+import { MyTickets } from '@/components/custom/MyTickets'
 import React from 'react'
 
 const page = () => {
   return (
-    <div>ticket main page</div>
+    <main>
+      <MyTickets/>
+    </main>
   )
 }
 

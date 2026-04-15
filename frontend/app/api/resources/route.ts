@@ -1,8 +1,8 @@
 import { auth0 } from '@/lib/auth0';
-import { SERVER_API_URL } from '@/lib/api-client';
+import { getBaseUrl, SERVER_API_URL } from '@/lib/api-client';
 import { NextRequest, NextResponse } from 'next/server';
 
-export async function GET(request:NextRequest) {
+export async function GET(request: NextRequest) {
   try {
     const session = await auth0.getSession();
     if (!session?.user) {
@@ -13,8 +13,11 @@ export async function GET(request:NextRequest) {
     }
 
     const { token } = await auth0.getAccessToken();
+
     const search = request.nextUrl.search;
-    const backendRes = await fetch(`${SERVER_API_URL}/api/resources${search}`, {
+
+    const Api_Url = getBaseUrl();
+    const backendRes = await fetch(`${Api_Url}/api/resources${search}`, {
       method: 'GET',
       headers: {
         Authorization: `Bearer ${token}`,
