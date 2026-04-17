@@ -21,3 +21,4 @@ RUN --mount=type=cache,target=/root/.cache/uv \
 EXPOSE 2024
 
 CMD ["uv", "run", "langgraph", "dev", "--host", "0.0.0.0", "--port", "2024"]
+# CMD ["uv", "run", "langgraph", "dev", "--port", "2024"]

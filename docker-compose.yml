@@ -160,6 +160,7 @@ services:
       - API_KEY=ollama
       - USER_AGENT=ai_python/1.0
       - UV_LINK_MODE=copy
+      - LOG_LEVEL=DEBUG
     extra_hosts:
       - "host.docker.internal:host-gateway"
     networks:

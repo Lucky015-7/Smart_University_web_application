@@ -4,6 +4,15 @@
 		"../../docker-compose.yml"
 	],
 	"service": "ai_python",
+	"runServices": [
+		"database",
+		"db-init",
+		"minio",
+		"minio-init",
+		"backend",
+		"frontend",
+		"ai_python"
+	],
 	"workspaceFolder": "/app",
 	"shutdownAction": "stopCompose",
 	"remoteUser": "root",
