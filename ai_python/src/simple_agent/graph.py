@@ -1,13 +1,12 @@
 """Minimal LangChain agent graph for deployment."""
-
 from __future__ import annotations
-
 import ast
 import os
 from dotenv import load_dotenv
 from datetime import datetime, timezone
 from typing import Any
 
+from langgraph.config import get_config
 from langchain.agents import create_agent
 from langchain_core.tools import tool
 from langchain_openai import ChatOpenAI
@@ -21,6 +20,9 @@ modelBaseURL = os.getenv("OPENAI_BASE_URL")
 modelApiKey = os.getenv("API_KEY")
 
 model = ChatOpenAI(model=modelName, base_url=modelBaseURL, api_key=modelApiKey)
+
+def my_node(state, config):
+  UserJwtToken = config["configurable"].get("user_jwt_token")
 
 
 @tool
@@ -63,7 +65,9 @@ def calculator(expression: str) -> str:
 
 # ---------------------------------------------------------------------------------------------------------------
 
-testToken = "Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6Ims1VE9fTHBkX2NKWVVlcHhwTjdsbiJ9.eyJodHRwczovL3NtYXJ0Y2FtcHVzLmFwaS9yb2xlcyI6WyJBRE1JTiJdLCJodHRwczovL3NtYXJ0Y2FtcHVzLmFwaS9lbWFpbCI6ImFkbWluLnRlc3RAZ21haWwuY29tIiwiaHR0cHM6Ly9zbWFydGNhbXB1cy5hcGkvbmFtZSI6ImFkbWluLnRlc3RAZ21haWwuY29tIiwiaXNzIjoiaHR0cHM6Ly9kZXYtNGNpa3czc3VlMHZ3c2x5MC51cy5hdXRoMC5jb20vIiwic3ViIjoiYXV0aDB8NjljMjI2OGJiYmNiZDVkY2M4YzVhMDRhIiwiYXVkIjpbImh0dHBzOi8vc21hcnRjYW1wdXMuYXBpIiwiaHR0cHM6Ly9kZXYtNGNpa3czc3VlMHZ3c2x5MC51cy5hdXRoMC5jb20vdXNlcmluZm8iXSwiaWF0IjoxNzc2Mzc3MzI5LCJleHAiOjE3NzY0NjM3MjksInNjb3BlIjoib3BlbmlkIHByb2ZpbGUgZW1haWwiLCJhenAiOiJRUmcxNWtac1ZHS29VNVBmNDJhbjRlSW5CeTRSMlpuMCJ9.eaUeNE99Owh5uAwPKJ5tqbR-YkAFxDqeaR7CrCE66W_Alo6anoPBQX9UjJOg-2hzuCGTBBnECAudUFsleBMnOFxBRv93N5102YeoGJDQpok7KzK2_hm_slrUU-JcIh3BoUUO0FkSg_kNnAhfpl67IG52dDCPG77QSv7S-D_jo2Tm3AWvE15quMBe4gmvQ9etFJWdJ2_O3HOvyr5iD6FMt3jlb78EXoHGTLErGIJpf-TX86xco3G4II9anbpeC9j0RjZS8BlJu8zsdrpLdCY7PeKT2YGsH3t8sfD4ysSknnmLRgaf-LBpkArp61PCR5h-aFiYOj5IOjTtasc9bbYaSw"
+
+
+# testToken = "Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6Ims1VE9fTHBkX2NKWVVlcHhwTjdsbiJ9.eyJodHRwczovL3NtYXJ0Y2FtcHVzLmFwaS9yb2xlcyI6WyJBRE1JTiJdLCJodHRwczovL3NtYXJ0Y2FtcHVzLmFwaS9lbWFpbCI6ImFkbWluLnRlc3RAZ21haWwuY29tIiwiaHR0cHM6Ly9zbWFydGNhbXB1cy5hcGkvbmFtZSI6ImFkbWluLnRlc3RAZ21haWwuY29tIiwiaXNzIjoiaHR0cHM6Ly9kZXYtNGNpa3czc3VlMHZ3c2x5MC51cy5hdXRoMC5jb20vIiwic3ViIjoiYXV0aDB8NjljMjI2OGJiYmNiZDVkY2M4YzVhMDRhIiwiYXVkIjpbImh0dHBzOi8vc21hcnRjYW1wdXMuYXBpIiwiaHR0cHM6Ly9kZXYtNGNpa3czc3VlMHZ3c2x5MC51cy5hdXRoMC5jb20vdXNlcmluZm8iXSwiaWF0IjoxNzc2NDI5MTc3LCJleHAiOjE3NzY1MTU1NzcsInNjb3BlIjoib3BlbmlkIHByb2ZpbGUgZW1haWwiLCJhenAiOiJRUmcxNWtac1ZHS29VNVBmNDJhbjRlSW5CeTRSMlpuMCJ9.O4Z1mU_-_703hOf55Aas53r0oOn_zd4EAxo9jemnEP28D00KO9ba8v651p71nLo8bpjwqSD-ptViqfNOF081GlsKziBlwskXUIy_tXwvTkeaH5T-ZXYtHRSwmHCVqR0MB1-pck4GBo38PWbExKQm6GhxC2lMNj0f1jVMsiZbSOLI9lSDTYK3-vY7aDdEqN8xPYPKuO4cxKOhaVrXPhyYvlduINteOZfOBGn-I1o5jhNFM4TrN_GvO9WpKUgnP9z4yQHRGe0ufXjAIqhiv9lx3YQUrRMQF4Ux-aaAUMAE74o0CyIZ2SEJYcKCfFz82Sc1n3e8pAm5MoGQ8-orllQKGw"
 
 
 def searchByLocation(
@@ -296,6 +300,25 @@ def campusResources(
             → name="Advanced Robotics", type="LAB"
     """
 
+    config = get_config()
+    userjwttoken = config["configurable"].get("userjwttoken")
+
+    print('-------------------------------------------------------------------------------------')
+    print('-------------------------------------------------------------------------------------')
+    print('-------------------------------------------------------------------------------------')
+    print('-------------------------------------------------------------------------------------')
+    print('-------------------------------------------------------------------------------------')
+    print('-------------------------------------------------------------------------------------')
+    print('-------------------------------------------------------------------------------------')
+    print('-------------------------------------------------------------------------------------')
+    print('-------------------------------------------------------------------------------------')
+    print('-------------------------------------------------------------------------------------')
+    print(userjwttoken)
+
+
+    if not userjwttoken:
+        return "Error: No Authorization token provided in request configuration."
+
     location = location.strip() if location else None
     name = name.strip() if name else None
     type = type.strip() if type else None
@@ -307,7 +330,7 @@ def campusResources(
     url = f"{base_url}/api/resources"
 
     headers = {
-        "Authorization": testToken,
+        "Authorization": userjwttoken,
         "Content-Type": "application/json",
     }
 

@@ -121,14 +121,28 @@ services:
     env_file:
       - .env
     volumes:
+      # - ./frontend:/app
       - ./frontend:/app
       - /app/node_modules
+      - /app/.next
+
+    # # this option will not update the host pc code
+    # develop:
+    #   watch:
+    #     - action: sync
+    #       path: ./frontend
+    #       target: /app
+    #       ignore:
+    #         - node_modules/
+    #         - .next/
     environment:
       # - DEBUG=true
       - NEXT_PUBLIC_API_URL=http://localhost:8118
       - INTERNAL_API_URL=http://backend:8080
-      - CHOKIDAR_USEPOLLING=true
-      - WATCHPACK_POLLING=true
+      - NODE_ENV=development
+      # - CHOKIDAR_USEPOLLING=true
+      # - WATCHPACK_POLLING=true
+      # - NEXT_TURBO_WATCH=true
       - HOSTNAME=0.0.0.0
       # - WATCHPACK_POLLING=1000
       # - CHOKIDAR_USEPOLLING=true
@@ -160,7 +174,7 @@ services:
       - API_KEY=ollama
       - USER_AGENT=ai_python/1.0
       - UV_LINK_MODE=copy
-      - LOG_LEVEL=DEBUG
+      # - LOG_LEVEL=DEBUG
     extra_hosts:
       - "host.docker.internal:host-gateway"
     networks:
