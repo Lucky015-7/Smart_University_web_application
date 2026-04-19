@@ -3,8 +3,10 @@ package com.smartcampus.backend.service;
 import com.smartcampus.backend.dto.*;
 import com.smartcampus.backend.model.Booking;
 import com.smartcampus.backend.model.ResourceAvailability;
+import com.smartcampus.backend.model.User;
 import com.smartcampus.backend.repository.BookingRepository;
 import com.smartcampus.backend.repository.ResourceAvailabilityRepository;
+import com.smartcampus.backend.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,6 +30,9 @@ public class BookingService {
 
     @Autowired
     private ResourceAvailabilityRepository resourceAvailabilityRepository;
+
+    @Autowired
+    private UserRepository userRepository;
 
     private static final DateTimeFormatter ID_FORMATTER = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
 
@@ -313,9 +318,17 @@ public class BookingService {
      * Convert Booking entity to BookingListItem DTO with HATEOAS links.
      */
     private BookingListItem convertToBookingListItem(Booking booking) {
+        // Fetch user details
+        User user = userRepository.findById(booking.getUserId()).orElse(null);
+        BookingListItem.UserInfo userInfo = null;
+        if (user != null) {
+            userInfo = new BookingListItem.UserInfo(user.getId(), user.getName(), user.getEmail());
+        }
+
         BookingListItem item = new BookingListItem(
                 booking.getId(),
                 new BookingListItem.ResourceInfo(booking.getResourceId(), "Resource " + booking.getResourceId()),
+                userInfo,
                 booking.getStartTime(),
                 booking.getEndTime(),
                 booking.getStatus());
