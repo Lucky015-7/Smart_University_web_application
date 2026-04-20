@@ -1,11 +1,12 @@
-export const formatNotificationDate = (dateString: string | undefined): string => {
-  if (!dateString) return "N/A";
+export const formatDateTime = (
+  dateString: string | null | undefined
+): string => {
+  if (!dateString) return "N/A"
 
-  const date = new Date(dateString);
+  const date = new Date(dateString)
 
-  // Check if the date is actually valid to prevent "Invalid Date" showing in UI
-  if (isNaN(date.getTime())) {
-    return "Invalid Date";
+  if (Number.isNaN(date.getTime())) {
+    return "Invalid Date"
   }
 
   return new Intl.DateTimeFormat("en-US", {
@@ -15,5 +16,9 @@ export const formatNotificationDate = (dateString: string | undefined): string =
     hour: "numeric",
     minute: "2-digit",
     hour12: true,
-  }).format(date);
-};
+  }).format(date)
+}
+
+export const formatNotificationDate = (dateString: string | undefined): string => {
+  return formatDateTime(dateString)
+}
