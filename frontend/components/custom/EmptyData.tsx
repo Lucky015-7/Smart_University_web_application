@@ -1,5 +1,5 @@
 "use client"
-import { ArrowUpRightIcon, FolderXIcon, Home } from "lucide-react"
+import { FolderXIcon, Home } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import {

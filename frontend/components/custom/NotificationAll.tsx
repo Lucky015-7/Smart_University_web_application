@@ -1,9 +1,7 @@
 'use client'
-import React, { useEffect, useState } from 'react'
 import { NotificationBox } from '@/components/custom/NotificationBox'
-import { Card, CardContent, CardHeader } from "@/components/ui/card"
+import { Card, CardContent } from "@/components/ui/card"
 import { Skeleton } from "@/components/ui/skeleton"
-import { toast } from 'sonner'
 import { useNotifications } from '@/hooks/useNotifications'
 
 

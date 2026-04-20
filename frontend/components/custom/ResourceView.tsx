@@ -1,10 +1,8 @@
 "use client"
-import { CLIENT_API_URL } from '@/lib/api-client';
-import React, { useEffect, useState } from 'react'
+import Image from "next/image";
+import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
-import Image from "next/image"
 
-import { AspectRatio } from "@/components/ui/aspect-ratio"
 import {
     Timeline,
     TimelineDate,
@@ -13,10 +11,11 @@ import {
     TimelineItem,
     TimelineSeparator,
     TimelineTitle,
-} from "@/components/reui/timeline"
+} from "@/components/reui/timeline";
+import { AspectRatio } from "@/components/ui/aspect-ratio";
 
-import { cn } from "@/lib/utils"
 import { formatTime } from '@/lib/formatTime';
+import { cn } from "@/lib/utils";
 
 
 interface AvailabilityWindow {

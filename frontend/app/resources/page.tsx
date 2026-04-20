@@ -1,8 +1,10 @@
 "use client"
+import { EmptyData } from '@/components/custom/EmptyData';
+import { LoadingData } from '@/components/custom/LoadingData';
 import { ResourceCard } from '@/components/custom/ResourceCard';
-import { Item } from '@/components/ui/item';
-import React, { useEffect, useState } from 'react'
-import { toast } from "sonner"
+import { Button } from "@/components/ui/button";
+import { Field } from "@/components/ui/field";
+import { Input } from "@/components/ui/input";
 import {
     Pagination,
     PaginationContent,
@@ -11,12 +13,9 @@ import {
     PaginationLink,
     PaginationNext,
     PaginationPrevious,
-} from "@/components/ui/pagination"
-import { Button } from "@/components/ui/button"
-import { Field } from "@/components/ui/field"
-import { Input } from "@/components/ui/input"
-import { EmptyData } from '@/components/custom/EmptyData';
-import { LoadingData } from '@/components/custom/LoadingData';
+} from "@/components/ui/pagination";
+import { useEffect, useState } from 'react';
+import { toast } from "sonner";
 
 interface Resource {
     id: string;

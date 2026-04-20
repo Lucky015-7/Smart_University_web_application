@@ -1,9 +1,9 @@
 "use client"
 import Image from "next/image"
 
-import { Card } from "@/components/ui/card"
 import classroomImg from "@/assets/classroom1.jpg"
 import { Badge } from "@/components/ui/badge"
+import { Card } from "@/components/ui/card"
 
 
 interface campusResourcesType {

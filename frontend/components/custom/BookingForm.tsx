@@ -1,43 +1,32 @@
 "use client"
 
-import * as React from "react"
-import { format } from "date-fns"
-import { ChevronDownIcon } from "lucide-react"
-import { useForm, Controller } from "react-hook-form"
 import { Calendar } from "@/components/ui/calendar"
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover"
+import { format } from "date-fns"
+import { ChevronDownIcon } from "lucide-react"
+import * as React from "react"
+import { Controller, useForm } from "react-hook-form"
 
 import { Button } from "@/components/ui/button"
-import { Checkbox } from "@/components/ui/checkbox"
 import {
   Field,
   FieldDescription,
   FieldError,
   FieldGroup,
   FieldLabel,
-  FieldLegend,
-  FieldSeparator,
   FieldSet,
-  FieldTitle,
+  FieldTitle
 } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
-import * as z from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { toast } from "sonner"
 import { useRouter } from "next/navigation"
+import { toast } from "sonner"
+import * as z from "zod"
 
 // form validation
 const bookingSchema = z.object({

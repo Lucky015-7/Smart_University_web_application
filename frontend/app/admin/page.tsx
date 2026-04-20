@@ -1,14 +1,9 @@
-import { BentoCard, BentoGrid } from '@/components/ui/bento-grid'
-import React from 'react'
+import { BentoCard, BentoGrid } from '@/components/ui/bento-grid';
 import {
     BellIcon,
-    CalendarIcon,
-    FileTextIcon,
-    GlobeIcon,
-    InputIcon,
-    RadiobuttonIcon,
-} from "@radix-ui/react-icons"
-import { BookDownIcon, TicketIcon } from "lucide-react"
+    RadiobuttonIcon
+} from "@radix-ui/react-icons";
+import { BookDownIcon, TicketIcon } from "lucide-react";
 
 
 const features = [

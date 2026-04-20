@@ -1,6 +1,6 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { getBaseUrl } from '@/lib/api-client';
 import { auth0 } from '@/lib/auth0';
-import { getBaseUrl, SERVER_API_URL } from '@/lib/api-client';
+import { NextRequest, NextResponse } from 'next/server';
 
 export async function POST(request: NextRequest) {
   try {

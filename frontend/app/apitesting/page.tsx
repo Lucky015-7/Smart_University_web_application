@@ -74,8 +74,8 @@
 
 
 
-import React, { useEffect, useState } from 'react'
 import { getBaseUrl } from '@/lib/api-client';
+import { useEffect, useState } from 'react';
 
 const page = () => {
     const [apiResponse, setApiResponse] = useState<string | null>(null);

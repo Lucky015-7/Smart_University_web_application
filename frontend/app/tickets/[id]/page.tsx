@@ -1,8 +1,7 @@
 "use client"
-import { ResourceView } from '@/components/custom/ResourceView'
+import { ResourceView } from '@/components/custom/ResourceView';
 import { TicketForm } from '@/components/custom/TicketForm';
 import { useParams } from 'next/navigation';
-import React from 'react'
 
 const page = () => {
   const params = useParams();

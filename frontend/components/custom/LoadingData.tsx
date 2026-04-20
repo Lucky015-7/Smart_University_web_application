@@ -1,17 +1,14 @@
 "use client"
-import { Home } from "lucide-react"
 
-import { Button } from "@/components/ui/button"
 import {
     Empty,
-    EmptyContent,
     EmptyDescription,
     EmptyHeader,
     EmptyMedia,
-    EmptyTitle,
+    EmptyTitle
 } from "@/components/ui/empty"
-import { useRouter } from "next/navigation"
 import { Spinner } from "@/components/ui/spinner"
+import { useRouter } from "next/navigation"
 
 export const LoadingData = () => {
     const router = useRouter();

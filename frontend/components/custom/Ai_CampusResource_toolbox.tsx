@@ -1,8 +1,7 @@
 "use client";
-import React from "react";
+import { Shimmer } from "../ai-elements/shimmer";
 import { BackgroundGradient } from "../ui/background-gradient";
 import { Ai_CampusResource_card } from "./Ai_CampusResource_card";
-import { Shimmer } from "../ai-elements/shimmer";
 
 
 

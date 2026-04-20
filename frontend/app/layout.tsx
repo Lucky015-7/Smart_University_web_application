@@ -1,13 +1,13 @@
-import { Geist, Geist_Mono, Inter } from "next/font/google"
+import { Geist_Mono, Inter } from "next/font/google";
 
-import "./globals.css"
-import { ThemeProvider } from "@/components/theme-provider"
-import { cn } from "@/lib/utils";
-import { AuthProvider } from "@/lib/auth-context";
 import { NavigationBar } from "@/components/custom/NavigationBar";
-import { Toaster } from "@/components/ui/sonner"
+import { ThemeProvider } from "@/components/theme-provider";
+import { Toaster } from "@/components/ui/sonner";
+import { AuthProvider } from "@/lib/auth-context";
 import { auth0 } from "@/lib/auth0";
+import { cn } from "@/lib/utils";
 import { redirect } from "next/navigation";
+import "./globals.css";
 
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-sans' })

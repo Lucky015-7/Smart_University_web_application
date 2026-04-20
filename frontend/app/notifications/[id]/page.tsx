@@ -1,20 +1,17 @@
 "use client"
-import React, { useEffect, useState } from "react"
+import MarkdownPreview from "@/components/custom/MarkdownPreview"
 import {
   Card,
-  CardAction,
   CardContent,
-  CardDescription,
-  CardFooter,
   CardHeader,
-  CardTitle,
+  CardTitle
 } from "@/components/ui/card"
-import MarkdownPreview from "@/components/custom/MarkdownPreview"
 import { Separator } from "@/components/ui/separator"
-import { useParams } from "next/navigation"
 import { Skeleton } from "@/components/ui/skeleton"
-import { toast } from "sonner"
 import { formatNotificationDate } from "@/lib/formatDateTime"
+import { useParams } from "next/navigation"
+import { useEffect, useState } from "react"
+import { toast } from "sonner"
 
 const title = "Smart Campus: Incident Report"
 const ReferenceId = "12222"

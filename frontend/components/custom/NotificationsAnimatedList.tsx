@@ -1,11 +1,10 @@
 "use client"
 import { useNotifications } from '@/hooks/useNotifications';
-import React from 'react'
-import { AnimatedList } from '../ui/animated-list';
+import { formatTimeAgo } from '@/lib/formatTimeAgo';
 import { cn } from '@/lib/utils';
 import { Bell } from 'lucide-react';
+import { AnimatedList } from '../ui/animated-list';
 import { AspectRatio } from '../ui/aspect-ratio';
-import { formatTimeAgo } from '@/lib/formatTimeAgo';
 
 export const NotificationsAnimatedList = ({ className }: { className?: string }) => {
     const { notifications, loading } = useNotifications();

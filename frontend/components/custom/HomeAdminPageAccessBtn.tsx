@@ -1,9 +1,8 @@
 "use client"
-import React from 'react'
-import { Alert, AlertAction, AlertTitle } from '../ui/alert'
 import { ShieldCheckIcon } from 'lucide-react'
-import { Button } from '../ui/button'
 import { useRouter } from 'next/navigation'
+import { Alert, AlertAction, AlertTitle } from '../ui/alert'
+import { Button } from '../ui/button'
 
 export const HomeAdminPageAccessBtn = () => {
     const router = useRouter()

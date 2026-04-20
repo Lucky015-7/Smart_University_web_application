@@ -1,14 +1,13 @@
 "use client"
-import React, { useEffect, useState } from 'react'
 import { MoreHorizontalIcon } from "lucide-react"
+import { useEffect, useState } from 'react'
 
 import { Button } from "@/components/ui/button"
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
+  DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu"
 import {
   Table,
@@ -19,12 +18,12 @@ import {
   TableRow,
 } from "@/components/ui/table"
 
+import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
 import { Field } from '../ui/field'
 import { Input } from '../ui/input'
-import { useRouter } from 'next/navigation'
-import { LoadingData } from './LoadingData'
 import { EmptyData } from './EmptyData'
+import { LoadingData } from './LoadingData'
 
 
 interface ResourceSummary {

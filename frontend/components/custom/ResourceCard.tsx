@@ -1,10 +1,9 @@
 "use client"
-import React from 'react'
-import { Card } from '@/components/ui/card'
+import { Card } from '@/components/ui/card';
+import Image from "next/image";
 import { useRouter } from 'next/navigation';
-import Image from "next/image"
 
-import { AspectRatio } from "@/components/ui/aspect-ratio"
+import { AspectRatio } from "@/components/ui/aspect-ratio";
 
 
 interface Resource {

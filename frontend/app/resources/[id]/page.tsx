@@ -1,9 +1,7 @@
 "use client"
 import { ResourceView } from '@/components/custom/ResourceView';
-import { useParams } from 'next/navigation';
-import React from 'react'
 import { Button } from '@/components/ui/button';
-import { useRouter } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 
 
 

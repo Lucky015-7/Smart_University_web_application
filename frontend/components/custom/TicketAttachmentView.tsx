@@ -1,4 +1,3 @@
-import React from 'react'
 import { FocusCards } from "@/components/ui/focus-cards";
 
 

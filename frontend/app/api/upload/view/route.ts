@@ -1,5 +1,5 @@
-import { auth0 } from '@/lib/auth0';
 import { getBaseUrl } from '@/lib/api-client';
+import { auth0 } from '@/lib/auth0';
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function GET(request: NextRequest) {

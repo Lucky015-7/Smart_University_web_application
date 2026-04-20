@@ -2,7 +2,6 @@
 import { BookingForm } from '@/components/custom/BookingForm';
 import { ResourceView } from '@/components/custom/ResourceView';
 import { useParams } from 'next/navigation';
-import React from 'react'
 
 const page = () => {
   const params = useParams();

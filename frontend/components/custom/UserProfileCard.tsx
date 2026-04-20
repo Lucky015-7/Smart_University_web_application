@@ -1,19 +1,12 @@
-import React from 'react'
 import { AspectRatio } from "@/components/ui/aspect-ratio"
-import Image from "next/image"
-import { BadgeCheck, BookmarkIcon, CheckCircle2Icon } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
-import { Separator } from '@/components/ui/separator'
 import {
     Card,
-    CardAction,
-    CardContent,
-    CardDescription,
-    CardFooter,
-    CardHeader,
-    CardTitle,
+    CardContent
 } from "@/components/ui/card"
 import { Spinner } from "@/components/ui/spinner"
+import { BadgeCheck, CheckCircle2Icon } from "lucide-react"
+import Image from "next/image"
 
 
 const profilePicture = "https://images.pexels.com/photos/1827837/pexels-photo-1827837.jpeg"

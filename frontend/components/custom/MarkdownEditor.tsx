@@ -1,7 +1,7 @@
 'use client'
-import React, { useState } from 'react'
 import MDEditor from '@uiw/react-md-editor';
 import { useTheme } from 'next-themes';
+import { useState } from 'react';
 
 export const MarkdownEditor = () => {
     const [markdownValue, setMarkdownValue] = useState<string>("Hello!")

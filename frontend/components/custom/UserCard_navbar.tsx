@@ -1,19 +1,18 @@
 "use client";
-import React, { useMemo } from 'react'
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
     HoverCard,
     HoverCardContent,
     HoverCardTrigger,
-} from "@/components/ui/hover-card"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { useAuth } from '@/lib/auth-context'
-import { getRoleDisplayName } from '@/lib/roles'
-import { Skeleton } from "@/components/ui/skeleton"
-import Link from "next/link";
+} from "@/components/ui/hover-card";
+import { Skeleton } from "@/components/ui/skeleton";
+import { useAuth } from '@/lib/auth-context';
+import { getRoleDisplayName } from '@/lib/roles';
+import { useMemo } from 'react';
 
-import { Badge } from "@/components/ui/badge"
-import { BadgeCheck, EditIcon, LogOut } from "lucide-react"
+import { Badge } from "@/components/ui/badge";
 import { Button } from '@/components/ui/button';
+import { BadgeCheck, EditIcon, LogOut } from "lucide-react";
 import { useRouter } from 'next/navigation';
 
 function initialsFromName(name: string) {

@@ -2,7 +2,6 @@
 import { AddComments } from '@/components/custom/AddComments';
 import { TicketPreview } from '@/components/custom/TicketPreview';
 import { useParams } from 'next/navigation';
-import React from 'react'
 
 const page = () => {
     const params = useParams();

@@ -1,6 +1,5 @@
 "use client";
 import { motion } from "motion/react";
-import React from "react";
 import { ImagesSlider } from "../ui/images-slider";
 
 export const HomeImageSlider = () => {

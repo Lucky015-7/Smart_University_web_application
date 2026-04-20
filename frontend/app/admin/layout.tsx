@@ -1,20 +1,17 @@
 "use client";
-import React, { useState } from "react";
 import { Sidebar, SidebarBody, SidebarLink } from "@/components/ui/sidebar";
+import { cn } from "@/lib/utils";
 import {
-    IconAdjustmentsCheck,
     IconArrowLeft,
     IconBook2,
-    IconBrandTabler,
     IconDotsCircleHorizontal,
     IconGridDots,
     IconPackages,
-    IconSettings,
     IconTicket,
-    IconUserBolt,
+    IconUserBolt
 } from "@tabler/icons-react";
 import { motion } from "motion/react";
-import { cn } from "@/lib/utils";
+import React, { useState } from "react";
 
 const links = [
     {

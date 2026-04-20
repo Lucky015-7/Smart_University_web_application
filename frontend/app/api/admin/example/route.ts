@@ -1,6 +1,6 @@
-import { NextRequest, NextResponse } from 'next/server';
 import { requireRole } from '@/lib/auth-middleware';
 import { UserRole } from '@/lib/roles';
+import { NextRequest, NextResponse } from 'next/server';
 
 /**
  * EXAMPLE: Protected API route that requires ADMIN role

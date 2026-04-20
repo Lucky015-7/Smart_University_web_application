@@ -1,6 +1,5 @@
 import { UserDashboardBento } from '@/components/custom/UserDashboardBento'
 import { UserProfileCard } from '@/components/custom/UserProfileCard'
-import React from 'react'
 
 
 const page = () => {

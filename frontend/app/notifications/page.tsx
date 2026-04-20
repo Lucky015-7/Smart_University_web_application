@@ -1,5 +1,4 @@
 import { Notification } from '@/components/custom/NotificationAll'
-import React from 'react'
 
 
 const page = () => {

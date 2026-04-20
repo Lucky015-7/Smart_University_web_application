@@ -5,17 +5,14 @@ import {
     DropdownMenuGroup,
     DropdownMenuItem,
     DropdownMenuLabel,
-    DropdownMenuSeparator,
-    DropdownMenuTrigger,
+    DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu"
-import { Bell } from 'lucide-react'
-import React from 'react'
-import { Notification } from '@/components/custom/NotificationAll'
-import { useRouter } from 'next/navigation'
-import { NotificationBox } from './NotificationBox'
 import { useNotifications } from '@/hooks/useNotifications'
+import { Bell } from 'lucide-react'
+import { useRouter } from 'next/navigation'
 import { Card, CardContent } from '../ui/card'
 import { Skeleton } from '../ui/skeleton'
+import { NotificationBox } from './NotificationBox'
 
 
 

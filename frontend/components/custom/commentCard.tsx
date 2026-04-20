@@ -1,9 +1,7 @@
-import React from 'react'
-import { Card, CardContent } from '../ui/card'
 import { Alert, AlertTitle } from '../ui/alert'
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar'
+import { Card, CardContent } from '../ui/card'
 import MarkdownPreview from './MarkdownPreview'
-import { Separator } from '../ui/separator'
 
 
 interface commentCardTypes {

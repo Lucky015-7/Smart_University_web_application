@@ -1,6 +1,5 @@
 "use client";
-import React, { useState } from "react";
-import { Sidebar, SidebarBody, SidebarLink } from "../ui/sidebar";
+import { cn } from "@/lib/utils";
 import {
   IconArrowLeft,
   IconBrandTabler,
@@ -8,7 +7,8 @@ import {
   IconUserBolt,
 } from "@tabler/icons-react";
 import { motion } from "motion/react";
-import { cn } from "@/lib/utils";
+import { useState } from "react";
+import { Sidebar, SidebarBody, SidebarLink } from "../ui/sidebar";
 
 export function AdminSidebar() {
   const links = [

@@ -1,10 +1,20 @@
 "use client"
 
-import * as React from "react"
 import { EyeIcon, RefreshCwIcon, Trash2Icon } from "lucide-react"
+import * as React from "react"
 import { toast } from "sonner"
 
 import { ResourceView } from "@/components/custom/ResourceView"
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
@@ -16,16 +26,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog"
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog"
 import { Input } from "@/components/ui/input"
 import {
   Select,
@@ -34,7 +34,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table"
 import { Textarea } from "@/components/ui/textarea"
 
 type BookingStatus = "PENDING" | "APPROVED" | "REJECTED" | "CANCELLED" | string
@@ -97,7 +104,12 @@ interface BookingDetailsResponse {
 }
 
 const PAGE_SIZE = 10
-const STATUS_OPTIONS: BookingStatus[] = ["PENDING", "APPROVED", "REJECTED", "CANCELLED"]
+const STATUS_OPTIONS: BookingStatus[] = [
+  "PENDING",
+  "APPROVED",
+  "REJECTED",
+  "CANCELLED",
+]
 
 const formatDateTime = (iso: string) => {
   const value = new Date(iso)
@@ -110,7 +122,9 @@ const formatDateTime = (iso: string) => {
   })
 }
 
-const getStatusVariant = (status: BookingStatus): "default" | "secondary" | "destructive" | "outline" => {
+const getStatusVariant = (
+  status: BookingStatus
+): "default" | "secondary" | "destructive" | "outline" => {
   switch (status) {
     case "APPROVED":
       return "default"
@@ -159,7 +173,8 @@ export const AdminBookingList = () => {
   const [total, setTotal] = React.useState(0)
   const [totalPages, setTotalPages] = React.useState(1)
 
-  const [selectedBooking, setSelectedBooking] = React.useState<BookingListItem | null>(null)
+  const [selectedBooking, setSelectedBooking] =
+    React.useState<BookingListItem | null>(null)
 
   const [detailsOpen, setDetailsOpen] = React.useState(false)
   const [detailsLoading, setDetailsLoading] = React.useState(false)
@@ -171,41 +186,46 @@ export const AdminBookingList = () => {
 
   const [deleteOpen, setDeleteOpen] = React.useState(false)
 
-  const fetchBookings = React.useCallback(async (targetPage: number) => {
-    setLoading(true)
-    try {
-      const params = new URLSearchParams({
-        page: String(targetPage),
-        limit: String(PAGE_SIZE),
-      })
-      if (statusFilter !== "ALL") {
-        params.set("status", statusFilter)
+  const fetchBookings = React.useCallback(
+    async (targetPage: number) => {
+      setLoading(true)
+      try {
+        const params = new URLSearchParams({
+          page: String(targetPage),
+          limit: String(PAGE_SIZE),
+        })
+        if (statusFilter !== "ALL") {
+          params.set("status", statusFilter)
+        }
+
+        const response = await fetch(`/api/bookings?${params.toString()}`, {
+          method: "GET",
+          headers: { "Content-Type": "application/json" },
+        })
+
+        const result: BookingListResponse = await response.json()
+
+        if (!response.ok || result.status !== "success") {
+          throw new Error(
+            getErrorMessage(result.error, "Failed to fetch bookings")
+          )
+        }
+
+        setBookings(result.data.items)
+        setTotal(result.data.total)
+        setPage(result.data.page)
+        setTotalPages(result.data.totalPages)
+      } catch (error) {
+        toast.error(getErrorMessage(error, "Could not load bookings"))
+        setBookings([])
+        setTotal(0)
+        setTotalPages(1)
+      } finally {
+        setLoading(false)
       }
-
-      const response = await fetch(`/api/bookings?${params.toString()}`, {
-        method: "GET",
-        headers: { "Content-Type": "application/json" },
-      })
-
-      const result: BookingListResponse = await response.json()
-
-      if (!response.ok || result.status !== "success") {
-        throw new Error(getErrorMessage(result.error, "Failed to fetch bookings"))
-      }
-
-      setBookings(result.data.items)
-      setTotal(result.data.total)
-      setPage(result.data.page)
-      setTotalPages(result.data.totalPages)
-    } catch (error) {
-      toast.error(getErrorMessage(error, "Could not load bookings"))
-      setBookings([])
-      setTotal(0)
-      setTotalPages(1)
-    } finally {
-      setLoading(false)
-    }
-  }, [statusFilter])
+    },
+    [statusFilter]
+  )
 
   React.useEffect(() => {
     fetchBookings(1)
@@ -230,12 +250,17 @@ export const AdminBookingList = () => {
     setDetailsLoading(true)
     setDetails(null)
     try {
-      const detailsPath = toLocalApiPath(booking._links?.self?.href, `/api/bookings/${booking.id}`)
+      const detailsPath = toLocalApiPath(
+        booking._links?.self?.href,
+        `/api/bookings/${booking.id}`
+      )
       const response = await fetch(detailsPath, { method: "GET" })
       const result: BookingDetailsResponse = await response.json()
 
       if (!response.ok || result.status !== "success") {
-        throw new Error(getErrorMessage(result.error, "Failed to load booking details"))
+        throw new Error(
+          getErrorMessage(result.error, "Failed to load booking details")
+        )
       }
 
       setDetails(result.data)
@@ -254,7 +279,9 @@ export const AdminBookingList = () => {
 
   const onOpenStatusDialog = (booking: BookingListItem) => {
     setSelectedBooking(booking)
-    setNextStatus(STATUS_OPTIONS.includes(booking.status) ? booking.status : "PENDING")
+    setNextStatus(
+      STATUS_OPTIONS.includes(booking.status) ? booking.status : "PENDING"
+    )
     setStatusReason("")
     setStatusOpen(true)
   }
@@ -269,7 +296,10 @@ export const AdminBookingList = () => {
 
     setActionLoading(true)
     try {
-      const basePath = toLocalApiPath(selectedBooking._links?.self?.href, `/api/bookings/${selectedBooking.id}`)
+      const basePath = toLocalApiPath(
+        selectedBooking._links?.self?.href,
+        `/api/bookings/${selectedBooking.id}`
+      )
       const statusPath = `${basePath}/status`
 
       const response = await fetch(statusPath, {
@@ -286,7 +316,9 @@ export const AdminBookingList = () => {
       const result = await response.json().catch(() => null)
 
       if (!response.ok) {
-        throw new Error(getErrorMessage(result?.error, "Failed to update status"))
+        throw new Error(
+          getErrorMessage(result?.error, "Failed to update status")
+        )
       }
 
       toast.success("Booking status updated")
@@ -307,14 +339,19 @@ export const AdminBookingList = () => {
 
     setActionLoading(true)
     try {
-      const deletePath = toLocalApiPath(selectedBooking._links?.self?.href, `/api/bookings/${selectedBooking.id}`)
+      const deletePath = toLocalApiPath(
+        selectedBooking._links?.self?.href,
+        `/api/bookings/${selectedBooking.id}`
+      )
       const response = await fetch(deletePath, {
         method: "DELETE",
       })
 
       if (!response.ok) {
         const result = await response.json().catch(() => null)
-        throw new Error(getErrorMessage(result?.error, "Failed to delete booking"))
+        throw new Error(
+          getErrorMessage(result?.error, "Failed to delete booking")
+        )
       }
 
       toast.success("Booking deleted")
@@ -331,11 +368,13 @@ export const AdminBookingList = () => {
   }
 
   return (
-    <div className="space-y-6 p-4 md:p-6 w-full">
+    <div className="w-full space-y-6 p-4 md:p-6">
       <Card className="p-5">
         <div className="mb-4 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
           <div>
-            <h1 className="text-2xl font-semibold tracking-tight">Booking Management</h1>
+            <h1 className="text-2xl font-semibold tracking-tight">
+              Booking Management
+            </h1>
             <p className="text-sm text-muted-foreground">
               Review, approve, reject, and remove resource bookings.
             </p>
@@ -394,13 +433,19 @@ export const AdminBookingList = () => {
             <TableBody>
               {loading ? (
                 <TableRow>
-                  <TableCell colSpan={6} className="py-10 text-center text-muted-foreground">
+                  <TableCell
+                    colSpan={6}
+                    className="py-10 text-center text-muted-foreground"
+                  >
                     Loading bookings...
                   </TableCell>
                 </TableRow>
               ) : filteredBookings.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={6} className="py-10 text-center text-muted-foreground">
+                  <TableCell
+                    colSpan={6}
+                    className="py-10 text-center text-muted-foreground"
+                  >
                     No bookings found for the current filters.
                   </TableCell>
                 </TableRow>
@@ -412,29 +457,50 @@ export const AdminBookingList = () => {
                     </TableCell>
                     <TableCell>
                       <p className="font-medium">{booking.resource.name}</p>
-                      <p className="text-xs text-muted-foreground">{booking.resource.id}</p>
+                      <p className="text-xs text-muted-foreground">
+                        {booking.resource.id}
+                      </p>
                     </TableCell>
                     <TableCell>
                       <p className="font-medium">{booking.user.name}</p>
-                      <p className="text-xs text-muted-foreground">{booking.user.email}</p>
+                      <p className="text-xs text-muted-foreground">
+                        {booking.user.email}
+                      </p>
                     </TableCell>
                     <TableCell>
-                      <p className="text-sm">{formatDateTime(booking.startTime)}</p>
-                      <p className="text-xs text-muted-foreground">to {formatDateTime(booking.endTime)}</p>
+                      <p className="text-sm">
+                        {formatDateTime(booking.startTime)}
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        to {formatDateTime(booking.endTime)}
+                      </p>
                     </TableCell>
                     <TableCell>
-                      <Badge variant={getStatusVariant(booking.status)}>{booking.status}</Badge>
+                      <Badge variant={getStatusVariant(booking.status)}>
+                        {booking.status}
+                      </Badge>
                     </TableCell>
                     <TableCell>
                       <div className="flex justify-end gap-2">
-                        <Button size="sm" variant="outline" onClick={() => onOpenDetails(booking)}>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => onOpenDetails(booking)}
+                        >
                           <EyeIcon className="mr-1 h-4 w-4" />
                           View
                         </Button>
-                        <Button size="sm" onClick={() => onOpenStatusDialog(booking)}>
+                        <Button
+                          size="sm"
+                          onClick={() => onOpenStatusDialog(booking)}
+                        >
                           Update
                         </Button>
-                        <Button size="sm" variant="destructive" onClick={() => onOpenDeleteDialog(booking)}>
+                        <Button
+                          size="sm"
+                          variant="destructive"
+                          onClick={() => onOpenDeleteDialog(booking)}
+                        >
                           <Trash2Icon className="mr-1 h-4 w-4" />
                           Delete
                         </Button>
@@ -449,7 +515,8 @@ export const AdminBookingList = () => {
 
         <div className="mt-4 flex flex-col gap-3 text-sm md:flex-row md:items-center md:justify-between">
           <p className="text-muted-foreground">
-            Showing {filteredBookings.length} item(s) on page {page} of {totalPages}. Total records: {total}
+            Showing {filteredBookings.length} item(s) on page {page} of{" "}
+            {totalPages}. Total records: {total}
           </p>
 
           <div className="flex items-center gap-2">
@@ -473,8 +540,8 @@ export const AdminBookingList = () => {
         </div>
       </Card>
 
-      <Dialog open={detailsOpen} onOpenChange={setDetailsOpen} >
-        <DialogContent className="max-h-[92vh] lg:max-w-5xl overflow-y-auto">
+      <Dialog open={detailsOpen} onOpenChange={setDetailsOpen}>
+        <DialogContent className="max-h-[92vh] overflow-y-auto lg:max-w-5xl">
           <DialogHeader>
             <DialogTitle>Booking Details</DialogTitle>
             <DialogDescription>
@@ -483,9 +550,13 @@ export const AdminBookingList = () => {
           </DialogHeader>
 
           {detailsLoading ? (
-            <div className="py-10 text-center text-muted-foreground">Loading details...</div>
+            <div className="py-10 text-center text-muted-foreground">
+              Loading details...
+            </div>
           ) : !details ? (
-            <div className="py-10 text-center text-muted-foreground">Could not load booking details.</div>
+            <div className="py-10 text-center text-muted-foreground">
+              Could not load booking details.
+            </div>
           ) : (
             <div className="grid gap-4 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)]">
               <Card className="overflow-hidden p-4">
@@ -511,18 +582,28 @@ export const AdminBookingList = () => {
                     ["Start", formatDateTime(details.startTime)],
                     ["End", formatDateTime(details.endTime)],
                     ["Purpose", details.purpose || "-"],
-                    ["Expected Attendees", details.expectedAttendees !== null ? String(details.expectedAttendees) : "-"],
+                    [
+                      "Expected Attendees",
+                      details.expectedAttendees !== null
+                        ? String(details.expectedAttendees)
+                        : "-",
+                    ],
                     ["Status", details.status],
                     ["Reason", details.reason || "-"],
                     ["Resource ID", details.resourceId],
                   ].map(([label, value]) => (
-                    <div key={label} className="grid gap-1 border-b pb-2 last:border-b-0 last:pb-0 sm:grid-cols-[140px_minmax(0,1fr)] sm:gap-4">
-                      <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                    <div
+                      key={label}
+                      className="grid gap-1 border-b pb-2 last:border-b-0 last:pb-0 sm:grid-cols-[140px_minmax(0,1fr)] sm:gap-4"
+                    >
+                      <p className="text-xs font-medium tracking-wide text-muted-foreground uppercase">
                         {label}
                       </p>
-                      <p className="break-words text-sm font-medium leading-6 text-foreground">
+                      <p className="text-sm leading-6 font-medium break-words text-foreground">
                         {label === "Status" ? (
-                          <Badge variant={getStatusVariant(details.status)}>{value}</Badge>
+                          <Badge variant={getStatusVariant(details.status)}>
+                            {value}
+                          </Badge>
                         ) : (
                           value
                         )}
@@ -536,7 +617,10 @@ export const AdminBookingList = () => {
 
           <DialogFooter>
             {selectedBooking ? (
-              <Button variant="outline" onClick={() => onOpenStatusDialog(selectedBooking)}>
+              <Button
+                variant="outline"
+                onClick={() => onOpenStatusDialog(selectedBooking)}
+              >
                 Update Status
               </Button>
             ) : null}
@@ -556,7 +640,10 @@ export const AdminBookingList = () => {
           <div className="space-y-3">
             <div className="space-y-2">
               <p className="text-sm font-medium">Status</p>
-              <Select value={nextStatus} onValueChange={(value) => setNextStatus(value as BookingStatus)}>
+              <Select
+                value={nextStatus}
+                onValueChange={(value) => setNextStatus(value as BookingStatus)}
+              >
                 <SelectTrigger className="w-full">
                   <SelectValue placeholder="Select status" />
                 </SelectTrigger>
@@ -597,11 +684,14 @@ export const AdminBookingList = () => {
           <AlertDialogHeader>
             <AlertDialogTitle>Delete Booking?</AlertDialogTitle>
             <AlertDialogDescription>
-              This action cannot be undone. The selected booking will be permanently removed.
+              This action cannot be undone. The selected booking will be
+              permanently removed.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel disabled={actionLoading}>Cancel</AlertDialogCancel>
+            <AlertDialogCancel disabled={actionLoading}>
+              Cancel
+            </AlertDialogCancel>
             <AlertDialogAction variant="destructive" onClick={onDeleteBooking}>
               Delete Booking
             </AlertDialogAction>

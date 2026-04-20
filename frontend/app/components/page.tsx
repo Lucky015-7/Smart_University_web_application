@@ -1,5 +1,4 @@
 import { MarkdownEditor } from '@/components/custom/MarkdownEditor'
-import React from 'react'
 
 
 const page = () => {

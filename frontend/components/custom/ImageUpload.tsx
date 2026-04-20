@@ -2,19 +2,19 @@
 "use client"
 
 import {
+    Alert,
+    AlertDescription,
+    AlertTitle,
+} from "@/components/reui/alert"
+import {
     formatBytes,
     useFileUpload,
     type FileMetadata,
     type FileWithPreview,
 } from "@/hooks/use-file-upload"
-import {
-    Alert,
-    AlertDescription,
-    AlertTitle,
-} from "@/components/reui/alert"
 
-import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
+import { cn } from "@/lib/utils"
 import { CircleAlertIcon, FileIcon, PlusIcon, XIcon } from 'lucide-react'
 
 interface FileUploadCompactProps {

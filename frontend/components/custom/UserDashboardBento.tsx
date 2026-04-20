@@ -1,17 +1,13 @@
-import {
-  BellIcon,
-  CalendarIcon,
-  FileTextIcon,
-  GlobeIcon,
-  InputIcon,
-  RadiobuttonIcon,
-} from "@radix-ui/react-icons"
-import { BentoCard, BentoGrid } from "../ui/bento-grid"
-import { NotificationsAnimatedList } from "./NotificationsAnimatedList"
-import { BookDownIcon, TicketIcon } from "lucide-react"
 import { DotPattern } from "@/components/ui/dot-pattern"
 import { HexagonPattern } from "@/components/ui/hexagon-pattern"
-import { BackgroundGradientAnimation } from "../ui/background-gradient-animation";
+import {
+  BellIcon,
+  RadiobuttonIcon
+} from "@radix-ui/react-icons"
+import { BookDownIcon, TicketIcon } from "lucide-react"
+import { BackgroundGradientAnimation } from "../ui/background-gradient-animation"
+import { BentoCard, BentoGrid } from "../ui/bento-grid"
+import { NotificationsAnimatedList } from "./NotificationsAnimatedList"
 
 
 const features = [

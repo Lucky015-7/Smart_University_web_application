@@ -1,8 +1,8 @@
-import { auth0 } from '@/lib/auth0'
-import { SERVER_API_URL } from '@/lib/api-client';
-import { redirect } from 'next/navigation';
-import { HomeImageSlider } from '@/components/custom/HomeImageSlider';
 import { HomeAdminPageAccessBtn } from '@/components/custom/HomeAdminPageAccessBtn';
+import { HomeImageSlider } from '@/components/custom/HomeImageSlider';
+import { SERVER_API_URL } from '@/lib/api-client';
+import { auth0 } from '@/lib/auth0';
+import { redirect } from 'next/navigation';
 
 type BackendProfileResponse = {
   status: 'success';

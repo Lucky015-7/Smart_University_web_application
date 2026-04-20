@@ -1,6 +1,6 @@
+import { getBaseUrl, SERVER_API_URL } from "@/lib/api-client";
 import { auth0 } from "@/lib/auth0";
 import { NextResponse } from "next/server";
-import { getBaseUrl, SERVER_API_URL } from "@/lib/api-client";
 
 type BackendProfileResponse = {
   status: "success";
