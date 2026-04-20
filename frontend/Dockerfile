@@ -12,10 +12,13 @@ RUN apt-get update && apt-get install -y \
 COPY package.json package-lock.json* ./
 
 # Cache npm installs (root has full access to /home/node/.npm)
-RUN --mount=type=cache,target=/home/node/.npm \
+# RUN --mount=type=cache,target=/home/node/.npm \
+#     npm install
+
+RUN --mount=type=cache,target=/root/.npm \
     npm install
 
 COPY . .
 
 EXPOSE 3000
-CMD ["npm", "run", "dev"]
+CMD ["npm", "run", "dev:webpack"]
