@@ -74,8 +74,6 @@
     --sidebar-ring: oklch(0.556 0 0);
 } */
 
-
-
 /* ------------------------------------------------------------ */
 /* 
 :root {
@@ -165,9 +163,6 @@
     --invert-foreground: var(--color-zinc-50);
 } */
 
-
-
-
 :root {
   /* ── Base ── */
   --background:           oklch(0.958 0.008 248);   /* cool gray-white  #F2F4F7 */
@@ -229,6 +224,8 @@
   --warning-foreground:   var(--color-yellow-900);
   --info:                 oklch(0.548 0.130 183);
   --info-foreground:      oklch(0.200 0.050 183);
+  --invert:           var(--color-zinc-900);
+  --invert-foreground:           var(--color-zinc-50);
 }
 
 .dark {
@@ -280,6 +277,9 @@
   --warning-foreground:   var(--color-yellow-600);
   --info:                 oklch(0.680 0.140 183);
   --info-foreground:      oklch(0.790 0.130 183);
+  --destructive-foreground:           var(--color-red-600);
+  --invert:           var(--color-zinc-700);
+  --invert-foreground:           var(--color-zinc-50);
 }
 
 @theme inline {
@@ -351,7 +351,7 @@
     transform: translateX(-50%) translateY(-10%);
   }
 }
- 
+
 /* gradient color animation by aceternity */
 @keyframes moveInCircle {
   0% {
