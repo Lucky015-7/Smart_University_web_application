@@ -174,7 +174,7 @@ export const MyTickets = () => {
           <div>
             <label className="text-sm font-medium mb-2 block">Status</label>
             <Select value={statusFilter} onValueChange={setStatusFilter}>
-              <SelectTrigger>
+              <SelectTrigger className="w-full">
                 <SelectValue placeholder="Filter by status" />
               </SelectTrigger>
               <SelectContent>
@@ -190,7 +190,7 @@ export const MyTickets = () => {
           <div>
             <label className="text-sm font-medium mb-2 block">Priority</label>
             <Select value={priorityFilter} onValueChange={setPriorityFilter}>
-              <SelectTrigger>
+              <SelectTrigger className="w-full">
                 <SelectValue placeholder="Filter by priority" />
               </SelectTrigger>
               <SelectContent>
