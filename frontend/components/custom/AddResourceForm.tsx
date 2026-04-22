@@ -115,14 +115,23 @@ export const AddResourceForm = () => {
             }
 
             // Prepare resource data
-            const payload = {
+            const payload: Record<string, unknown> = {
                 name: values.name,
                 type: values.type,
-                capacity: values.capacity || null,
                 location: values.location,
                 status: values.status,
-                description: values.description || null,
-                imageUrl: uploadedImageUrl || null,
+            }
+
+            if (typeof values.capacity === "number") {
+                payload.capacity = values.capacity
+            }
+
+            if (values.description) {
+                payload.description = values.description
+            }
+
+            if (uploadedImageUrl) {
+                payload.imageUrl = uploadedImageUrl
             }
 
             // Submit resource to backend
@@ -134,10 +143,11 @@ export const AddResourceForm = () => {
                 body: JSON.stringify(payload),
             })
 
-            const result = await response.json();
+            const hasJson = response.headers.get("content-type")?.includes("application/json")
+            const result = hasJson ? await response.json() : null
 
             if (!response.ok) {
-                toast.error(result.error?.message || "Failed to create resource");
+                toast.error(result?.error?.message || "Failed to create resource");
                 setIsLoading(false)
                 return;
             }
@@ -160,7 +170,7 @@ export const AddResourceForm = () => {
     }
 
     return (
-        <div className="w-full max-w-2xl mx-auto">
+        <div className="w-full">
             <Card className="border border-border/50 shadow-lg">
                 <div className="p-8">
                     <div className="mb-8">

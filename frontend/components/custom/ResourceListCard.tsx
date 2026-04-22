@@ -36,7 +36,7 @@ export function ResourceListCard({
         <div className="relative h-32 w-full overflow-hidden rounded-md border bg-muted/30 sm:h-full">
           {imageUrl && !hasImageError ? (
             <img
-              src={`/api/upload/view?fileName=${imageUrl}`}
+              src={`/api/upload/view?fileName=${encodeURIComponent(imageUrl)}`}
               alt={name}
               className="h-full w-full object-cover"
               loading="lazy"

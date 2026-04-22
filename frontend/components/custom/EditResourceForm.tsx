@@ -20,7 +20,7 @@ import {
 } from "@/components/ui/select"
 import { FileWithPreview } from "@/hooks/use-file-upload"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { useRouter, useParams } from "next/navigation"
+import { useRouter } from "next/navigation"
 import { useState, useEffect } from "react"
 import { Controller, useForm } from "react-hook-form"
 import { toast } from "sonner"
@@ -164,14 +164,25 @@ export const EditResourceForm = ({ resourceId }: { resourceId: string }) => {
             }
 
             // Prepare resource data
-            const payload = {
+            const payload: Record<string, unknown> = {
                 name: values.name,
                 type: values.type,
-                capacity: values.capacity || null,
                 location: values.location,
                 status: values.status,
-                description: values.description || null,
-                imageUrl: uploadedImageUrl || currentImageUrl || null,
+            }
+
+            if (typeof values.capacity === "number") {
+                payload.capacity = values.capacity
+            }
+
+            if (values.description) {
+                payload.description = values.description
+            }
+
+            if (uploadedImageUrl) {
+                payload.imageUrl = uploadedImageUrl
+            } else if (currentImageUrl) {
+                payload.imageUrl = currentImageUrl
             }
 
             // Submit resource to backend
@@ -183,10 +194,11 @@ export const EditResourceForm = ({ resourceId }: { resourceId: string }) => {
                 body: JSON.stringify(payload),
             })
 
-            const result = await response.json();
+            const hasJson = response.headers.get("content-type")?.includes("application/json")
+            const result = hasJson ? await response.json() : null
 
             if (!response.ok) {
-                toast.error(result.error?.message || "Failed to update resource");
+                toast.error(result?.error?.message || "Failed to update resource");
                 setIsLoading(false)
                 return;
             }
@@ -215,7 +227,7 @@ export const EditResourceForm = ({ resourceId }: { resourceId: string }) => {
     }
 
     return (
-        <div className="w-full max-w-2xl mx-auto">
+        <div className="w-full">
             <Card className="border border-border/50 shadow-lg">
                 <div className="p-8">
                     <div className="mb-8">
@@ -253,7 +265,7 @@ export const EditResourceForm = ({ resourceId }: { resourceId: string }) => {
                                         control={form.control}
                                         render={({ field }) => (
                                             <Select value={field.value} onValueChange={field.onChange} disabled={isLoading}>
-                                                <SelectTrigger id="type">
+                                                <SelectTrigger id="type" className="w-full">
                                                     <SelectValue placeholder="Select a type" />
                                                 </SelectTrigger>
                                                 <SelectContent>
@@ -319,8 +331,8 @@ export const EditResourceForm = ({ resourceId }: { resourceId: string }) => {
                                         control={form.control}
                                         render={({ field }) => (
                                             <Select value={field.value} onValueChange={field.onChange} disabled={isLoading}>
-                                                <SelectTrigger id="status">
-                                                    <SelectValue placeholder="Select status" />
+                                                <SelectTrigger id="status" className="w-full">
+                                                    <SelectValue placeholder="Select status"  />
                                                 </SelectTrigger>
                                                 <SelectContent>
                                                     <SelectGroup>
@@ -369,7 +381,7 @@ export const EditResourceForm = ({ resourceId }: { resourceId: string }) => {
                                         <p className="text-sm font-medium text-muted-foreground mb-2">Current Image</p>
                                         <div className="relative h-40 bg-muted rounded-lg overflow-hidden">
                                             <img
-                                                src={currentImageUrl}
+                                                src={`/api/upload/view?fileName=${encodeURIComponent(currentImageUrl)}`}
                                                 alt="Current resource"
                                                 className="w-full h-full object-cover"
                                             />

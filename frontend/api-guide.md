@@ -1,19 +1,20 @@
 # Backend API Guide for Frontend Developers
 
-This note describes the backend API contract used by the Smart Campus frontend. It focuses on the response envelope, request payloads, query parameters, error handling, and the endpoint patterns that appear across the app.
+This document describes the backend API contract currently implemented in the Smart Campus backend. It focuses on the response envelope, endpoint patterns, request payloads, query parameters, and error handling rules the frontend depends on.
 
 ## Base Conventions
 
 - Base path for application APIs: `/api`
-- Most list and detail endpoints return JSON wrapped in `ApiResponse<T>`
-- Most state-changing endpoints return `201 Created`, `200 OK`, or `204 No Content`
-- Most write operations use `Cache-Control: no-store`
-- Most list and detail read operations use `Cache-Control: public, max-age=300` or `no-store` depending on the module
-- Authentication is enforced on protected routes through the bearer token / JWT provided by the frontend
+- Most endpoints return JSON wrapped in `ApiResponse<T>`
+- Most write endpoints return `201 Created`, `200 OK`, or `204 No Content`
+- `Cache-Control` is module-dependent:
+  - Resources list/detail/availability: `public, max-age=300`
+  - Bookings, tickets, notifications: `no-store`
+- Protected routes derive user identity from the JWT `sub` claim
 
-## Standard Response Shape
+## Standard Response Envelope
 
-Most endpoints use this envelope:
+Success shape:
 
 ```json
 {
@@ -26,7 +27,7 @@ Most endpoints use this envelope:
 }
 ```
 
-When a request fails, the backend returns:
+Error shape:
 
 ```json
 {
@@ -40,7 +41,7 @@ When a request fails, the backend returns:
 }
 ```
 
-Frontend code should always check `status` first, then read `data` on success or `error.code` and `error.message` on failure.
+Frontend rule: always check `status` first, then read `data` on success or `error.code`/`error.message` on failure.
 
 ## Resource API
 
@@ -50,14 +51,14 @@ Lists resources with optional filtering and pagination.
 
 Query parameters:
 
-- `search` - optional text search on resource name
-- `type` - optional filter, one of `ROOM`, `LAB`, `EQUIPMENT`
-- `status` - optional filter, one of `ACTIVE`, `OUT_OF_SERVICE`
-- `minCapacity` - optional minimum capacity
-- `page` - 1-based page number, default `1`
-- `limit` - items per page, default `10`
+- `search` optional text search on resource name
+- `type` optional filter: `ROOM`, `LAB`, `EQUIPMENT`
+- `status` optional filter: `ACTIVE`, `OUT_OF_SERVICE`
+- `minCapacity` optional minimum capacity
+- `page` 1-based page number, default `1`
+- `limit` items per page, default `10`
 
-Response data:
+Response `data` shape:
 
 ```json
 {
@@ -81,13 +82,13 @@ Response data:
 }
 ```
 
-Important note: `imageUrl` is part of both the list and detail resource payloads. Frontend code can render it directly without an extra lookup.
+Envelope `_links` may include `self`, `next`, and `prev`.
 
 ### GET `/api/resources/{id}`
 
-Returns a single resource with full details.
+Returns a full resource record.
 
-Useful fields:
+Main fields:
 
 - `id`
 - `name`
@@ -97,8 +98,27 @@ Useful fields:
 - `status`
 - `description`
 - `imageUrl`
-- `availabilityWindows`
+- `availabilityWindows` (array of `{ day, startTime, endTime }`)
 - `createdAt`
+
+### GET `/api/resources/{id}/availability`
+
+Returns only availability data.
+
+Response `data` shape:
+
+```json
+{
+  "resourceId": "res_room_01",
+  "items": [
+    {
+      "day": "MONDAY",
+      "startTime": "08:00:00.0000000",
+      "endTime": "17:00:00.0000000"
+    }
+  ]
+}
+```
 
 ### POST `/api/resources`
 
@@ -114,50 +134,160 @@ Request body example:
   "location": "Building 1, Floor 2",
   "status": "ACTIVE",
   "description": "High-tech lecture room with 2 projectors.",
-  "imageUrl": "resources/sample_main_lecture_hall_a.jpg"
+  "imageUrl": "resources/sample_main_lecture_hall_a.jpg",
+  "availabilityWindows": [
+    {
+      "day": "MONDAY",
+      "startTime": "08:00:00",
+      "endTime": "17:00:00"
+    }
+  ]
 }
 ```
 
-The backend may also accept `availabilityWindows` for initial setup.
+`status` is optional and defaults to `ACTIVE` if omitted.
 
 ### PUT `/api/resources/{id}`
 
-Updates an existing resource. All fields are optional and are applied as a partial update.
+Updates a resource using partial-update semantics. All fields are optional.
+
+Important behavior:
+
+- If `availabilityWindows` is omitted, existing windows remain unchanged.
+- If `availabilityWindows` is provided as an empty array, all existing windows are removed.
 
 ### DELETE `/api/resources/{id}`
 
-Deletes a resource. On success, the endpoint returns `204 No Content`.
+Deletes the resource and its availability windows.
+
+Success response: `204 No Content`.
 
 ## Booking API
 
 ### GET `/api/bookings`
 
+Lists bookings with optional filtering and pagination.
+
 Query parameters:
 
-- `status` - optional booking status filter
-- `resourceId` - optional resource filter
-- `userId` - optional user filter
-- `page` - default `1`
-- `limit` - default `10`
+- `status` optional: `PENDING`, `APPROVED`, `REJECTED`, `CANCELLED`
+- `resourceId` optional resource filter
+- `userId` optional user filter
+- `page` default `1`
+- `limit` default `10`
 
-Use this endpoint when showing booking lists or booking history tables.
+Response `data` shape:
+
+```json
+{
+  "items": [
+    {
+      "id": "bkg_20260421122201_1234",
+      "resource": {
+        "id": "res_room_01",
+        "name": "Resource res_room_01"
+      },
+      "user": {
+        "id": "auth0|abc123",
+        "name": "John Doe",
+        "email": "john@example.com"
+      },
+      "startTime": "2026-04-23T10:00:00",
+      "endTime": "2026-04-23T11:00:00",
+      "status": "PENDING",
+      "_links": {
+        "self": { "href": "/api/bookings/bkg_20260421122201_1234" },
+        "resource": { "href": "/api/resources/res_room_01" },
+        "resource_availability": { "href": "/api/resources/res_room_01/availability" }
+      }
+    }
+  ],
+  "total": 1,
+  "page": 1,
+  "totalPages": 1
+}
+```
 
 ### GET `/api/bookings/me`
 
-Same filtering as the list endpoint, but the backend derives the user from the JWT subject. The frontend should not pass another user id here.
+Same response shape and filters as `GET /api/bookings`, except user identity is always derived from JWT. Do not send `userId` from frontend.
+
+Supported query parameters:
+
+- `status`
+- `resourceId`
+- `page`
+- `limit`
 
 ### POST `/api/bookings`
 
-Creates a booking request. The backend validates:
+Creates a booking request for the authenticated user.
 
-- authenticated user identity
-- booking conflicts
-- resource availability windows
-- status and time constraints
+Request body:
+
+```json
+{
+  "resourceId": "res_room_01",
+  "startTime": "2026-04-23T10:00:00",
+  "endTime": "2026-04-23T11:00:00",
+  "purpose": "Database lab",
+  "expectedAttendees": 40
+}
+```
+
+Backend validation includes:
+
+- JWT user identity exists (`sub` claim)
+- start/end time validity
+- no past bookings
+- overlap conflict detection
+- booking must be within configured resource availability windows
+- booking must start and end on the same day
 
 ### GET `/api/bookings/{id}`
 
-Returns booking details. The backend enforces access control so non-admin users can only read their own bookings.
+Returns full booking details.
+
+Non-admin users can only access their own bookings.
+
+Response fields include:
+
+- `id`
+- `resourceId`
+- `userId`
+- `startTime`
+- `endTime`
+- `purpose`
+- `expectedAttendees`
+- `status`
+- `reason`
+- `createdAt`
+- `updatedAt`
+
+### PATCH `/api/bookings/{id}/status`
+
+Updates booking status.
+
+Request body:
+
+```json
+{
+  "status": "APPROVED",
+  "reason": "Optional note"
+}
+```
+
+Rules:
+
+- Allowed status values: `APPROVED`, `REJECTED`, `CANCELLED`
+- `reason` is mandatory when status is `REJECTED`
+- Only `PENDING` bookings can be approved/rejected
+
+### DELETE `/api/bookings/{id}`
+
+Deletes a booking.
+
+Success response: `204 No Content`.
 
 ## Ticket API
 
@@ -165,24 +295,24 @@ Returns booking details. The backend enforces access control so non-admin users 
 
 Query parameters:
 
-- `status` - optional ticket status filter
-- `createdBy` - optional owner filter
-- `assignedTo` - optional technician filter
-- `resourceId` - optional resource filter
-- `page` - default `1`
-- `limit` - default `10`
+- `status` optional ticket status
+- `createdBy` optional creator filter
+- `assignedTo` optional technician filter
+- `resourceId` optional resource filter
+- `page` default `1`
+- `limit` default `10`
 
 ### GET `/api/tickets/me`
 
-Same as the list endpoint, but the backend derives the user from the JWT subject.
+Same endpoint behavior as list, but user is derived from JWT. No explicit `createdBy` should be sent.
 
 ### POST `/api/tickets`
 
-Creates a maintenance ticket. Attachments are typically uploaded first, then referenced by file name in the request.
+Creates a maintenance ticket. Attachments are typically uploaded first, then referenced by file name in the ticket payload.
 
 ### GET `/api/tickets/{id}`
 
-Returns ticket details, including nested comments and attachments.
+Returns full ticket details, including nested comments and attachments.
 
 ## Notifications API
 
@@ -190,16 +320,16 @@ Returns ticket details, including nested comments and attachments.
 
 Query parameter:
 
-- `read` - optional boolean filter
+- `read` optional boolean filter
   - `true` returns read notifications
   - `false` returns unread notifications
   - omitted returns all notifications
 
-The list response includes `items` inside `data`. Notification items contain their own `_links` field.
+List response keeps notifications in `data.items`.
 
 ### GET `/api/notifications/{id}`
 
-Returns a single notification for the authenticated user.
+Returns one notification owned by the authenticated user.
 
 ### PATCH `/api/notifications/{id}/read`
 
@@ -211,16 +341,16 @@ Marks all notifications as read.
 
 ## Error Handling Guide
 
-Use the following response codes as the main frontend branches:
+Use these status branches in frontend handling:
 
-- `400 Bad Request` - validation or query parameter error
-- `401 Unauthorized` - missing or invalid bearer token
-- `403 Forbidden` - authenticated, but not allowed to access the resource
-- `404 Not Found` - entity does not exist or is not accessible
-- `409 Conflict` - booking collision or similar business rule conflict
-- `500 Internal Server Error` - unexpected backend failure
+- `400 Bad Request` validation/query issues
+- `401 Unauthorized` missing or invalid bearer token
+- `403 Forbidden` authenticated but not allowed
+- `404 Not Found` entity missing or inaccessible
+- `409 Conflict` business rule conflict (for example booking overlap)
+- `500 Internal Server Error` unexpected backend failure
 
-Common backend error codes include:
+Common backend error codes:
 
 - `RESOURCE_VALIDATION_ERROR`
 - `RESOURCE_QUERY_VALIDATION_ERROR`
@@ -238,19 +368,19 @@ Common backend error codes include:
 
 ## Frontend Handling Notes
 
-- Always guard against `data` being `null` when `status` is `error`
-- Prefer reading the backend `_links` when you need navigation targets between related resources
-- For list pages, keep query state in the URL so pagination and filters remain shareable
-- For resource cards and detail pages, use `imageUrl` directly from the backend instead of hardcoding image paths
-- When a request fails with `401`, redirect the user back through the login flow or refresh the session
+- Always guard against `data === null` when `status === "error"`.
+- Prefer backend `_links` for navigation targets between related resources.
+- Keep list-page filter/pagination state in URL query params.
+- For resource cards/details, use backend-provided `imageUrl` directly.
+- On `401`, trigger login/session refresh flow.
 
 ## Practical Example
 
-For a resource list page, the frontend should typically:
+For a resource list page:
 
-1. Send `GET /api/resources?search=lab&type=LAB&page=1&limit=10`
+1. Request `GET /api/resources?search=lab&type=LAB&page=1&limit=10`
 2. Read `response.data.items`
-3. Render each item using `name`, `capacity`, `location`, `status`, and `imageUrl`
-4. Use `response._links.next` and `response._links.prev` for pagination buttons
+3. Render each card using `name`, `capacity`, `location`, `status`, and `imageUrl`
+4. Use `response._links.next` / `response._links.prev` for pagination controls
 
-This document should be kept in sync with the controller and DTO classes whenever the backend contract changes.
+Keep this guide aligned with backend controller and DTO changes.

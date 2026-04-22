@@ -48,7 +48,7 @@ import { Spinner } from "@/components/ui/spinner"
 import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
 import { toast } from "sonner"
-import { Edit2Icon, EyeIcon, TrashIcon, PlusIcon, SearchIcon } from "lucide-react"
+import { Edit2Icon, EyeIcon, TrashIcon, PlusIcon, SearchIcon, SlidersHorizontal, FilterX } from "lucide-react"
 
 interface Resource {
     id: string
@@ -59,7 +59,7 @@ interface Resource {
     status: "ACTIVE" | "OUT_OF_SERVICE"
     description?: string
     imageUrl?: string
-    createdAt: string
+    createdAt?: string
 }
 
 interface ListResponse {
@@ -71,11 +71,12 @@ interface ListResponse {
 
 export const ViewResourcesTable = () => {
     const router = useRouter()
+    const ALL_FILTER = "ALL"
     const [resources, setResources] = useState<Resource[]>([])
     const [isLoading, setIsLoading] = useState(true)
     const [search, setSearch] = useState("")
-    const [typeFilter, setTypeFilter] = useState("")
-    const [statusFilter, setStatusFilter] = useState("")
+    const [typeFilter, setTypeFilter] = useState(ALL_FILTER)
+    const [statusFilter, setStatusFilter] = useState(ALL_FILTER)
     const [page, setPage] = useState(1)
     const [limit] = useState(10)
     const [totalPages, setTotalPages] = useState(0)
@@ -96,8 +97,8 @@ export const ViewResourcesTable = () => {
             })
 
             if (search) queryParams.append("search", search)
-            if (typeFilter) queryParams.append("type", typeFilter)
-            if (statusFilter) queryParams.append("status", statusFilter)
+            if (typeFilter !== ALL_FILTER) queryParams.append("type", typeFilter)
+            if (statusFilter !== ALL_FILTER) queryParams.append("status", statusFilter)
 
             const response = await fetch(`/api/resources?${queryParams.toString()}`)
             const result = await response.json()
@@ -183,6 +184,12 @@ export const ViewResourcesTable = () => {
             : "bg-red-100 text-red-800"
     }
 
+    const hasSearch = search.trim().length > 0
+    const hasTypeFilter = typeFilter !== ALL_FILTER
+    const hasStatusFilter = statusFilter !== ALL_FILTER
+    const hasActiveFilters = hasSearch || hasTypeFilter || hasStatusFilter
+    const activeFilterCount = [hasSearch, hasTypeFilter, hasStatusFilter].filter(Boolean).length
+
     return (
         <div className="w-full space-y-6">
             {/* Header */}
@@ -201,64 +208,96 @@ export const ViewResourcesTable = () => {
             </div>
 
             {/* Filters Card */}
-            <Card className="border border-border/50">
-                <div className="p-6 space-y-4">
-                    <h3 className="font-semibold">Search & Filter</h3>
+            <Card className="border border-border/50 bg-linear-to-b from-background to-muted/20">
+                <div className="p-6 space-y-5">
+                    <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+                        <div className="flex items-center gap-2">
+                            <div className="rounded-md border border-border/60 bg-background p-2">
+                                <SlidersHorizontal className="h-4 w-4 text-muted-foreground" />
+                            </div>
+                            <div>
+                                <h3 className="font-semibold tracking-tight">Search & Filter</h3>
+                                <p className="text-xs text-muted-foreground">Narrow down resources by name, type, and status</p>
+                            </div>
+                        </div>
+                        <Badge variant={hasActiveFilters ? "default" : "secondary"}>
+                            {activeFilterCount} active {activeFilterCount === 1 ? "filter" : "filters"}
+                        </Badge>
+                    </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                        {/* Search */}
-                        <div className="relative">
-                            <SearchIcon className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                            <Input
-                                placeholder="Search by name..."
-                                value={search}
-                                onChange={(e) => setSearch(e.target.value)}
-                                className="pl-10"
-                            />
+                    <div className="grid grid-cols-1 gap-4 xl:grid-cols-12">
+                        <div className="space-y-2 xl:col-span-5">
+                            <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Search by resource name</p>
+                            <div className="relative">
+                                <SearchIcon className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                                <Input
+                                    placeholder="e.g., Main Lecture Hall"
+                                    value={search}
+                                    onChange={(e) => setSearch(e.target.value)}
+                                    className="h-10 rounded-md border-border/60 bg-background pl-10"
+                                />
+                            </div>
                         </div>
 
-                        {/* Type Filter */}
-                        <Select value={typeFilter} onValueChange={setTypeFilter}>
-                            <SelectTrigger>
-                                <SelectValue placeholder="Filter by type" />
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectGroup>
-                                    <SelectItem value="">All Types</SelectItem>
-                                    <SelectItem value="ROOM">Room</SelectItem>
-                                    <SelectItem value="LAB">Lab</SelectItem>
-                                    <SelectItem value="EQUIPMENT">Equipment</SelectItem>
-                                </SelectGroup>
-                            </SelectContent>
-                        </Select>
+                        <div className="space-y-2 xl:col-span-3">
+                            <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Resource type</p>
+                            <Select value={typeFilter} onValueChange={setTypeFilter}>
+                                <SelectTrigger className="h-10 border-border/60 bg-background w-full">
+                                    <SelectValue placeholder="Filter by type" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectGroup>
+                                        <SelectItem value={ALL_FILTER}>All Types</SelectItem>
+                                        <SelectItem value="ROOM">Room</SelectItem>
+                                        <SelectItem value="LAB">Lab</SelectItem>
+                                        <SelectItem value="EQUIPMENT">Equipment</SelectItem>
+                                    </SelectGroup>
+                                </SelectContent>
+                            </Select>
+                        </div>
 
-                        {/* Status Filter */}
-                        <Select value={statusFilter} onValueChange={setStatusFilter}>
-                            <SelectTrigger>
-                                <SelectValue placeholder="Filter by status" />
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectGroup>
-                                    <SelectItem value="">All Status</SelectItem>
-                                    <SelectItem value="ACTIVE">Active</SelectItem>
-                                    <SelectItem value="OUT_OF_SERVICE">Out of Service</SelectItem>
-                                </SelectGroup>
-                            </SelectContent>
-                        </Select>
+                        <div className="space-y-2 xl:col-span-3">
+                            <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Availability status</p>
+                            <Select value={statusFilter} onValueChange={setStatusFilter}>
+                                <SelectTrigger className="h-10 border-border/60 bg-background w-full">
+                                    <SelectValue placeholder="Filter by status" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectGroup>
+                                        <SelectItem value={ALL_FILTER}>All Status</SelectItem>
+                                        <SelectItem value="ACTIVE">Active</SelectItem>
+                                        <SelectItem value="OUT_OF_SERVICE">Out of Service</SelectItem>
+                                    </SelectGroup>
+                                </SelectContent>
+                            </Select>
+                        </div>
 
-                        {/* Clear Filters */}
-                        <Button
-                            variant="outline"
-                            onClick={() => {
-                                setSearch("")
-                                setTypeFilter("")
-                                setStatusFilter("")
-                                setPage(1)
-                            }}
-                        >
-                            Clear Filters
-                        </Button>
+                        <div className="xl:col-span-1 xl:self-end">
+                            <Button
+                                variant="outline"
+                                className="h-10 w-full"
+                                onClick={() => {
+                                    setSearch("")
+                                    setTypeFilter(ALL_FILTER)
+                                    setStatusFilter(ALL_FILTER)
+                                    setPage(1)
+                                }}
+                                disabled={!hasActiveFilters}
+                            >
+                                <FilterX className="mr-2 h-4 w-4" />
+                                Reset
+                            </Button>
+                        </div>
                     </div>
+
+                    {hasActiveFilters && (
+                        <div className="flex flex-wrap items-center gap-2 border-t border-border/50 pt-4">
+                            <span className="text-xs text-muted-foreground">Active:</span>
+                            {hasSearch && <Badge variant="secondary">Search: {search}</Badge>}
+                            {hasTypeFilter && <Badge variant="secondary">Type: {typeFilter}</Badge>}
+                            {hasStatusFilter && <Badge variant="secondary">Status: {statusFilter}</Badge>}
+                        </div>
+                    )}
                 </div>
             </Card>
 
@@ -398,15 +437,19 @@ export const ViewResourcesTable = () => {
 
                     {selectedResource && (
                         <div className="space-y-6">
-                            {selectedResource.imageUrl && (
-                                <div className="relative h-64 bg-muted rounded-lg overflow-hidden">
+                            <div className="relative h-64 bg-muted rounded-lg overflow-hidden border border-border/50">
+                                {selectedResource.imageUrl ? (
                                     <img
-                                        src={selectedResource.imageUrl}
+                                        src={`/api/upload/view?fileName=${encodeURIComponent(selectedResource.imageUrl)}`}
                                         alt={selectedResource.name}
                                         className="w-full h-full object-cover"
                                     />
-                                </div>
-                            )}
+                                ) : (
+                                    <div className="flex h-full items-center justify-center text-sm text-muted-foreground">
+                                        No image to display
+                                    </div>
+                                )}
+                            </div>
 
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
@@ -438,7 +481,9 @@ export const ViewResourcesTable = () => {
                                 <div>
                                     <p className="text-sm font-medium text-muted-foreground">Created</p>
                                     <p className="text-lg font-semibold mt-1">
-                                        {new Date(selectedResource.createdAt).toLocaleDateString()}
+                                        {selectedResource.createdAt
+                                            ? new Date(selectedResource.createdAt).toLocaleDateString()
+                                            : "Not available"}
                                     </p>
                                 </div>
                             </div>

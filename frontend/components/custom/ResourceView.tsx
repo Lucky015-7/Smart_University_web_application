@@ -236,7 +236,7 @@ export const ResourceView = ({ id }: { id: string }) => {
             <div className="relative h-60 w-full overflow-hidden rounded-lg border border-border/50 bg-muted/30">
               {resource.imageUrl && !imageError ? (
                 <img
-                  src={`/api/upload/view?fileName=${resource.imageUrl}`}
+                  src={`/api/upload/view?fileName=${encodeURIComponent(resource.imageUrl)}`}
                   alt={resource.name}
                   className="h-full w-full object-cover transition-transform duration-500 hover:scale-105"
                   loading="lazy"
