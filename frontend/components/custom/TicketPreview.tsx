@@ -36,7 +36,7 @@ interface ticketData {
     resource: {
         id: string
         name: string
-    }
+    } | null
     location: string
     category: string
     priority: string
@@ -60,11 +60,11 @@ interface ApiResponseProps {
 }
 
 const statusConfig: Record<string, { label: string; className: string }> = {
-  PENDING: { label: "Pending", className: "bg-yellow-500/10 text-yellow-700 dark:text-yellow-400" },
-  APPROVED: { label: "Approved", className: "bg-green-500/10 text-green-700 dark:text-green-400" },
+  OPEN: { label: "Open", className: "bg-yellow-500/10 text-yellow-700 dark:text-yellow-400" },
+  IN_PROGRESS: { label: "In Progress", className: "bg-blue-500/10 text-blue-700 dark:text-blue-400" },
+  RESOLVED: { label: "Resolved", className: "bg-green-500/10 text-green-700 dark:text-green-400" },
+  CLOSED: { label: "Closed", className: "bg-gray-500/10 text-gray-700 dark:text-gray-400" },
   REJECTED: { label: "Rejected", className: "bg-red-500/10 text-red-700 dark:text-red-400" },
-  CANCELLED: { label: "Cancelled", className: "bg-gray-500/10 text-gray-700 dark:text-gray-400" },
-  RESOLVED: { label: "Resolved", className: "bg-blue-500/10 text-blue-700 dark:text-blue-400" },
 }
 
 const priorityConfig: Record<string, { label: string; className: string }> = {
@@ -113,7 +113,7 @@ export const TicketPreview = ({ ticketId }: { ticketId: string }) => {
                 <div className="flex items-start justify-between gap-4">
                     <div className="space-y-2">
                         <h1 className="text-3xl font-bold tracking-tight">
-                            {ticket.resource.name}
+                            {ticket.resource?.name || "No Resource"}
                         </h1>
                         <p className="text-sm text-muted-foreground">
                             Ticket ID: {ticket.id}
