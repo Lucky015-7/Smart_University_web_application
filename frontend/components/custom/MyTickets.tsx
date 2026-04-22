@@ -41,7 +41,7 @@ interface TicketLinks {
 
 interface TicketResponseData {
   id: string;
-  resource: ResourceSummary;
+  resource: ResourceSummary | null;
   location: string;
   category: string;
   priority: string;
@@ -60,11 +60,11 @@ interface ApiResponseProps {
 }
 
 const statusConfig: Record<string, { label: string; className: string }> = {
-  PENDING: { label: "Pending", className: "bg-yellow-500/10 text-yellow-700 dark:text-yellow-400" },
-  APPROVED: { label: "Approved", className: "bg-green-500/10 text-green-700 dark:text-green-400" },
+  OPEN: { label: "Open", className: "bg-yellow-500/10 text-yellow-700 dark:text-yellow-400" },
+  IN_PROGRESS: { label: "In Progress", className: "bg-blue-500/10 text-blue-700 dark:text-blue-400" },
+  RESOLVED: { label: "Resolved", className: "bg-green-500/10 text-green-700 dark:text-green-400" },
+  CLOSED: { label: "Closed", className: "bg-gray-500/10 text-gray-700 dark:text-gray-400" },
   REJECTED: { label: "Rejected", className: "bg-red-500/10 text-red-700 dark:text-red-400" },
-  CANCELLED: { label: "Cancelled", className: "bg-gray-500/10 text-gray-700 dark:text-gray-400" },
-  RESOLVED: { label: "Resolved", className: "bg-blue-500/10 text-blue-700 dark:text-blue-400" },
 }
 
 const priorityConfig: Record<string, { label: string; className: string }> = {
@@ -118,8 +118,8 @@ export const MyTickets = () => {
     // Search filter
     if (searchTerm) {
       filtered = filtered.filter(ticket =>
-        ticket.resource.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        ticket.location.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (ticket.resource?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ?? false) ||
+        ticket.location?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         ticket.category.toLowerCase().includes(searchTerm.toLowerCase()) ||
         ticket.id.toLowerCase().includes(searchTerm.toLowerCase())
       );
@@ -271,7 +271,7 @@ export const MyTickets = () => {
                   <div className="flex items-start justify-between gap-4">
                     <div className="flex-1 space-y-1">
                       <CardTitle className="line-clamp-2 cursor-pointer hover:text-primary transition-colors">
-                        {ticket.resource.name}
+                        {ticket.resource?.name || "No Resource"}
                       </CardTitle>
                       <CardDescription className="text-xs">
                         ID: {ticket.id}
@@ -325,8 +325,8 @@ export const MyTickets = () => {
                     <Button
                       variant="outline"
                       size="sm"
-                      onClick={() => router.push(`/resources/${ticket.resource.id}`)}
-                    >
+                      onClick={() => ticket.resource && router.push(`/resources/${ticket.resource.id}`)}
+                      disabled={!ticket.resource}>
                       Resource
                     </Button>
                   </div>
