@@ -119,7 +119,39 @@ export const AddComments = ({ ticketId }: { ticketId: string }) => {
       </div>
     )
 
-  const onSubmit = async (values: TicketCommentFormData) => {}
+  const onSubmit = async (values: TicketCommentFormData) => {
+    try {
+      const response = await fetch(
+        `/api/tickets/${encodeURIComponent(ticketId)}/comments`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            text: values.comment,
+          }),
+        }
+      )
+
+      if (!response.ok) {
+        throw new Error("Failed to post comment")
+      }
+
+      const result = await response.json()
+
+      if (result.status === "success") {
+        // Add new comment to the list
+        setComments([...comments, result.data])
+        // Reset form
+        form.reset()
+        toast.success("Comment posted successfully!")
+      }
+    } catch (error) {
+      toast.error("Failed to post comment")
+      console.error("Error posting comment:", error)
+    }
+  }
 
   return (
     <div className="space-y-6">
