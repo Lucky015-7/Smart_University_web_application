@@ -4,6 +4,7 @@ import Image from "next/image"
 import classroomImg from "@/assets/classroom1.jpg"
 import { Badge } from "@/components/ui/badge"
 import { Card } from "@/components/ui/card"
+import { useRouter } from "next/navigation"
 
 
 interface campusResourcesType {
@@ -18,8 +19,11 @@ interface campusResourcesType {
 
 
 export const Ai_CampusResource_card = ({ id, name, type, capacity, location, status }: campusResourcesType) => {
+  const router = useRouter();
+
+
   return (
-    <Card className="group/card relative h-full w-full max-w-xs overflow-hidden border-0 p-0! cursor-pointer">
+    <Card className="group/card relative h-full w-full max-w-xs overflow-hidden border-0 p-0! cursor-pointer" onClick={() => window.open("/resources/" + id, "_blank", "noopener,noreferrer")}>
       <Image
         src={classroomImg}
         alt="Background"
