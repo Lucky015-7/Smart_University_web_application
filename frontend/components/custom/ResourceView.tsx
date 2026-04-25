@@ -21,6 +21,7 @@ import {
 } from "@/components/ui/card"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Separator } from "@/components/ui/separator"
+import { AvailabilityDisplay } from "@/components/custom/AvailabilityDisplay"
 
 import { formatTime } from "@/lib/formatTime"
 import { cn } from "@/lib/utils"
@@ -306,6 +307,8 @@ export const ResourceView = ({ id }: { id: string }) => {
           )}
         </CardContent>
       </Card>
+
+      <AvailabilityDisplay resourceId={resource.id} />
     </main>
   )
 }
