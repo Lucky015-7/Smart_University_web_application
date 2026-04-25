@@ -1,5 +1,6 @@
 import { auth0 } from "@/lib/auth0";
 import { NextResponse, type NextRequest } from "next/server";
+import { SERVER_API_URL } from "./lib/api-client";
 
 const PUBLIC_PATHS = ["/unauthorized"];
 
@@ -20,25 +21,74 @@ export async function proxy(request: NextRequest) {
 
   const session = await auth0.getSession(request);
 
+
+  try {
+    const { token } = await auth0.getAccessToken()
+    console.log("getAccessToken " + token)
+    // console.log( "getAccessToken " + expiresAt )
+
+    // Keep backend user record in sync with Auth0 identity.
+    await fetch(`${SERVER_API_URL}/api/auth/register`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+      cache: "no-store",
+    })
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : ""
+
+    console.error("Failed to load backend profile: ", error)
+  }
+
+
+
   if (!session || !session.user) {
     const loginUrl = new URL("/auth/login", request.url);
     loginUrl.searchParams.set("returnTo", `${pathname}${request.nextUrl.search}`);
     return NextResponse.redirect(loginUrl);
   }
 
-  const ADMIN_ONLY_PATHS = ["/admin", "/component"];
   const namespace = "https://smartcampus.api";
   const { user } = session;
-
+  
   // Safe fallback to empty array if roles is missing
   const roles = (user[`${namespace}/roles`] as string[]) ?? [];
   console.log("roles:", roles);
+  
+  // const ADMIN_ONLY_PATHS = ["/admin", "/component"];
+  // const isAdminPath = ADMIN_ONLY_PATHS.some((path) => pathname.startsWith(path));
 
-  const isAdminPath = ADMIN_ONLY_PATHS.some((path) => pathname.startsWith(path));
+  // if (isAdminPath && !roles.includes("ADMIN")) {
+  //   return NextResponse.redirect(new URL("/unauthorized", request.url));
+  // }
 
-  if (isAdminPath && !roles.includes("ADMIN")) {
+  const ADMIN_ONLY_PATHS = ["/admin/bookings", "/admin/resources", "/admin/users"]; 
+  const STAFF_PATHS = ["/admin/tickets"]; 
+
+
+
+  const isStrictAdminPath = ADMIN_ONLY_PATHS.some((path) => pathname.startsWith(path));
+  const isStaffPath = STAFF_PATHS.some((path) => pathname.startsWith(path));
+
+  // 1. Check Strict Admin Access
+  if (isStrictAdminPath && !roles.includes("ADMIN")) {
     return NextResponse.redirect(new URL("/unauthorized", request.url));
   }
+
+  // 2. Check Staff (Admin or Technician) Access
+  if (isStaffPath) {
+    const hasAccess = roles.includes("ADMIN") || roles.includes("TECHNICIAN");
+    if (!hasAccess) {
+      return NextResponse.redirect(new URL("/unauthorized", request.url));
+    }
+  }
+
+
+
+
+
 
   return auth0.middleware(request);
 }
