@@ -61,6 +61,13 @@ interface ApiResponseProps {
   error: string | null
 }
 
+interface UserResponse {
+  status: string
+  data?: {
+    id?: string
+  }
+}
+
 export const AddComments = ({ ticketId }: { ticketId: string }) => {
   const { theme, resolvedTheme } = useTheme() // for markdown editor
   const [isMounted, setIsMounted] = useState(false) // for markdown editor
@@ -85,30 +92,55 @@ export const AddComments = ({ ticketId }: { ticketId: string }) => {
 
   const [comments, setComments] = useState<CommentResponseData[]>([])
   const [loading, setLoading] = useState(true)
+  const [currentUserId, setCurrentUserId] = useState<string>("")
+
+  const fetchComments = async () => {
+    try {
+      const response = await fetch(
+        `/api/tickets/${encodeURIComponent(ticketId)}/comments`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      )
+      const result: ApiResponseProps = await response.json()
+      if (result.status === "success") {
+        setComments(result.data)
+      }
+    } catch (error) {
+      toast.warning("Something went wrong!")
+      console.error("Failed to fetch data:", error)
+    }
+  }
 
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchCurrentUser = async () => {
       try {
-        const response = await fetch(
-          `/api/tickets/${encodeURIComponent(ticketId)}/comments`,
-          {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-            },
-          }
-        )
-        const result: ApiResponseProps = await response.json()
-        if (result.status === "success") {
-          setComments(result.data)
+        const response = await fetch("/api/user")
+        if (!response.ok) return
+
+        const userData: UserResponse = await response.json()
+        const userId = userData?.data?.id
+        if (userId !== undefined && userId !== null) {
+          setCurrentUserId(String(userId))
         }
       } catch (error) {
-        toast.warning("Something went wrong!")
-        console.error("Failed to fetch data:", error)
+        console.error("Error fetching current user:", error)
+      }
+    }
+
+    const fetchData = async () => {
+      try {
+        setLoading(true)
+        await fetchComments()
       } finally {
         setLoading(false)
       }
     }
+
+    fetchCurrentUser()
     fetchData()
   }, [])
 
@@ -172,8 +204,13 @@ export const AddComments = ({ ticketId }: { ticketId: string }) => {
               {comments.map((comment) => (
                 <CommentCard
                   key={comment.id}
+                  commentId={comment.id}
                   userName={comment.authorName}
                   comment={comment.text}
+                  authorId={comment.authorId}
+                  currentUserId={currentUserId}
+                  ticketId={ticketId}
+                  onCommentUpdated={fetchComments}
                 />
               ))}
             </div>

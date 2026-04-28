@@ -7,6 +7,10 @@ import { cn } from "@/lib/utils"
 import { AlertCircle, Clock, MessageCircle, User, Calendar } from "lucide-react"
 import { formatTimeAgo } from "@/lib/formatTimeAgo"
 import { useRouter } from "next/navigation"
+import { useUserName } from "@/lib/useUserName"
+import { useAuth } from '@/lib/auth-context'
+import { UserRole } from '@/lib/roles'
+import { Loader2 } from 'lucide-react'
 
 interface TicketData {
   id: string
@@ -57,6 +61,30 @@ export const AdminTicketRow = ({
 
   const handleNavigateToDetail = () => {
     router.push(`/admin/tickets/${encodeURIComponent(ticket.id)}`)
+  }
+
+  function AssignedNameDisplay({ assignedTo }: { assignedTo: string | null }) {
+    const { name, email, loading } = useUserName(assignedTo)
+    const { hasRole, loading: authLoading } = useAuth()
+
+    if (!assignedTo) return <span>Unassigned</span>
+
+    const isAdmin = !authLoading && hasRole(UserRole.ADMIN)
+
+    if (loading) return (
+      <div className="flex items-center gap-2">
+        <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
+        <span className="text-xs text-muted-foreground">Loading...</span>
+      </div>
+    )
+
+    return (
+      <div className="flex flex-col">
+        <span className="text-sm">{name ?? assignedTo}</span>
+        {email && <span className="text-xs text-muted-foreground">{email}</span>}
+        {/* Raw user IDs are hidden for all users */}
+      </div>
+    )
   }
 
   return (
@@ -110,11 +138,9 @@ export const AdminTicketRow = ({
         {/* Footer: Assignee and Contact */}
         <div className="flex items-center justify-between pt-2 border-t border-border/30">
           <div className="flex items-center gap-2 text-xs">
-            <User className="h-3.5 w-3.5 text-muted-foreground" />
-            <span className="text-muted-foreground">
-              {ticket.assignedTo ? `Assigned: ${ticket.assignedTo}` : "Unassigned"}
-            </span>
-          </div>
+              <User className="h-3.5 w-3.5 text-muted-foreground" />
+              <AssignedNameDisplay assignedTo={ticket.assignedTo} />
+            </div>
           <Button
             variant="ghost"
             size="sm"

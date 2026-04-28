@@ -73,7 +73,7 @@ export default async function Page({
                 {/* Book Now — primary */}
                 <Link
                   href={`/booking/${id}`}
-                  className="group w-full rounded-lg bg-primary px-4 py-3.5 text-left transition-all hover:bg-primary/90 active:scale-[0.98]"
+                  className="group block w-full rounded-lg bg-primary px-4 py-3.5 text-left transition-all hover:bg-primary/90 active:scale-[0.98]"
                 >
                   <div className="flex items-center gap-3">
                     <div className="flex h-8 w-8 items-center justify-center rounded-md bg-primary-foreground/15 shrink-0">
@@ -89,7 +89,7 @@ export default async function Page({
                 {/* Incident Ticket — secondary */}
                 <Link
                   href={`/tickets/${id}`}
-                  className="group w-full rounded-lg border border-border/60 bg-background px-4 py-3.5 text-left transition-all hover:bg-muted/60 active:scale-[0.98]"
+                  className="group block w-full rounded-lg border border-border/60 bg-background px-4 py-3.5 text-left transition-all hover:bg-muted/60 active:scale-[0.98]"
                 >
                   <div className="flex items-center gap-3">
                     <div className="flex h-8 w-8 items-center justify-center rounded-md bg-destructive/10 shrink-0">

@@ -12,6 +12,7 @@ interface CampusResource {
     capacity: number | null;
     location: string | null;
     status: string;
+    imageUrl: string | null;
 }
 
 interface ToolboxProps {
@@ -28,9 +29,9 @@ export const Ai_CampusResource_toolbox = ({ rawOutput }: ToolboxProps) => {
         return (
             <main className="p-5 ">
                 <BackgroundGradient className="rounded-lg w-full p-4 bg-card ">
-                    <section className="flex gap-4 lg:gap-x-10 overflow-x-auto flex-nowrap lg:justify-center-safe px-6 scrollbar-hide h-70 lg:h-80 ">
+                    <section className="flex gap-4 lg:gap-x-10 overflow-x-auto no-scrollbar flex-nowrap lg:justify-center-safe px-6  h-80 lg:h-85 ">
                         {resources.map((resource) => (
-                            <div className="flex-shrink-0 w-60 lg:w-70 key={resource.id}">
+                            <div className="flex-shrink-0 w-60 lg:w-70" key={resource.id}>
 
                                 <Ai_CampusResource_card
                                     
@@ -40,6 +41,7 @@ export const Ai_CampusResource_toolbox = ({ rawOutput }: ToolboxProps) => {
                                     capacity={resource.capacity}
                                     location={resource.location}
                                     status={resource.status}
+                                    imageUrl={resource.imageUrl}
                                 />
                             </div>
                         ))}

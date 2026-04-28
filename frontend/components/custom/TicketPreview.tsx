@@ -9,7 +9,10 @@ import { Badge } from '../ui/badge'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card'
 import { Separator } from '../ui/separator'
 import { Button } from '../ui/button'
-import { Calendar, MapPin, AlertCircle, User, Clock } from 'lucide-react'
+import { Calendar, MapPin, AlertCircle, User, Clock, Loader2 } from 'lucide-react'
+import { useUserName } from '@/lib/useUserName'
+import { useAuth } from '@/lib/auth-context'
+import { UserRole } from '@/lib/roles'
 
 
 interface Link {
@@ -103,6 +106,10 @@ export const TicketPreview = ({ ticketId }: { ticketId: string }) => {
         fetchData();
     }, [ticketId]);
 
+    const assignedUser = useUserName(ticket?.assignedTo)
+    const createdByUser = useUserName(ticket?.createdBy)
+    const auth = useAuth()
+
     if (loading) return <div><LoadingData /></div>;
     if (!ticket) return <div><EmptyData /></div>;
 
@@ -178,7 +185,19 @@ export const TicketPreview = ({ ticketId }: { ticketId: string }) => {
                                 <User className="h-4 w-4" />
                                 <span className="text-xs font-medium">Assigned</span>
                             </div>
-                            <p className="font-semibold text-sm">{ticket.assignedTo || "Unassigned"}</p>
+                                                        <p className="font-semibold text-sm">
+                                                            {assignedUser.loading ? (
+                                                                <Loader2 className="inline-block h-4 w-4 animate-spin text-muted-foreground" />
+                                                            ) : (
+                                                                <>
+                                                                    {assignedUser.name ?? (ticket.assignedTo ?? "Unassigned")}
+                                                                    {assignedUser.email && (
+                                                                        <span className="ml-2 text-muted-foreground text-xs">{assignedUser.email}</span>
+                                                                    )}
+                                                                </>
+                                                            )}
+                                                            {/* Raw user IDs are hidden for all users */}
+                                                        </p>
                         </div>
                     </CardContent>
                 </Card>
@@ -204,10 +223,22 @@ export const TicketPreview = ({ ticketId }: { ticketId: string }) => {
                             <p className="text-xs text-muted-foreground font-medium mb-1">Contact Phone</p>
                             <p className="font-mono">{ticket.contactPhone}</p>
                         </div>
-                        <div>
-                            <p className="text-xs text-muted-foreground font-medium mb-1">Created By</p>
-                            <p>{ticket.createdBy}</p>
-                        </div>
+                                                <div>
+                                                        <p className="text-xs text-muted-foreground font-medium mb-1">Created By</p>
+                                                        <p className="text-sm">
+                                                            {createdByUser.loading ? (
+                                                                <Loader2 className="inline-block h-4 w-4 animate-spin text-muted-foreground" />
+                                                            ) : (
+                                                                <>
+                                                                    {createdByUser.name ?? ticket.createdBy}
+                                                                    {createdByUser.email && (
+                                                                        <span className="ml-2 text-muted-foreground text-xs">{createdByUser.email}</span>
+                                                                    )}
+                                                                </>
+                                                            )}
+                                                            {/* Raw user IDs are hidden for all users */}
+                                                        </p>
+                                                </div>
                     </div>
                 </CardContent>
             </Card>

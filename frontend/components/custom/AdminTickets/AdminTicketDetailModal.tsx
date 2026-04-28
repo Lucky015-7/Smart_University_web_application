@@ -15,6 +15,9 @@ import { toast } from "sonner"
 import { Loader2, AlertCircle, CheckCircle, XCircle, Clock, User, Phone, FileText } from "lucide-react"
 import dynamic from "next/dynamic"
 import { CommentCard } from "../commentCard"
+import { useUserName } from "@/lib/useUserName"
+import { useAuth } from '@/lib/auth-context'
+import { UserRole } from '@/lib/roles'
 
 const MDEditor = dynamic(() => import("@uiw/react-md-editor"), {
   ssr: false,
@@ -169,6 +172,30 @@ export const AdminTicketDetailModal = ({
   const statusOption = statusConfig[ticket.status] || statusConfig.OPEN
   const priorityOption = priorityConfig[ticket.priority] || priorityConfig.LOW
 
+  function ReportedByDisplay({ createdBy }: { createdBy: string }) {
+    const { name, email, loading } = useUserName(createdBy)
+    const auth = useAuth()
+
+    return (
+      <div>
+        {loading ? (
+          <div className="flex items-center gap-2">
+            <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
+            <span className="text-xs text-muted-foreground">Loading...</span>
+          </div>
+        ) : (
+          <div>
+            <p className="text-base">
+              {name ?? createdBy}
+              {email && <span className="ml-2 text-muted-foreground text-xs">{email}</span>}
+            </p>
+            {/* Raw user IDs are hidden for all users */}
+          </div>
+        )}
+      </div>
+    )
+  }
+
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="lg:max-w-4xl lg:max-h-[90vh] overflow-y-auto">
@@ -222,7 +249,7 @@ export const AdminTicketDetailModal = ({
                       <User className="h-4 w-4" />
                       Reported By
                     </p>
-                    <p className="text-base">{ticket.createdBy}</p>
+                      <ReportedByDisplay createdBy={ticket.createdBy} />
                   </div>
                 </div>
 

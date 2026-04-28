@@ -103,11 +103,17 @@ export const SchemaDisplayPath = ({
     '<span class="text-blue-600 dark:text-blue-400">{$1}</span>'
   );
 
+  const pathHtml =
+    typeof children === "string" || typeof children === "number"
+      ? String(children)
+      : highlightedPath;
+
   return (
     <span
       className={cn("font-mono text-sm", className)}
       // oxlint-disable-next-line eslint-plugin-react(no-danger)
-      dangerouslySetInnerHTML={{ __html: children ?? highlightedPath }}
+      // dangerouslySetInnerHTML={{ __html: children ?? highlightedPath }}
+      dangerouslySetInnerHTML={{ __html: pathHtml }}
       {...props}
     />
   );
