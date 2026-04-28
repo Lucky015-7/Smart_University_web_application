@@ -64,10 +64,10 @@ export default function LangSmithChat({ token }: {token:string}) {
 
 
   return (
-    <div className=" mx-auto max-w-7xl p-6 relative size-full rounded-lg  h-[90dvh]">
-      <div className="flex flex-col h-full">
-        <Conversation>
-          <ConversationContent>
+    <div className=" mx-auto max-w-7xl p-6 relative size-full rounded-lg  h-[90dvh] ">
+      <div className="flex flex-col h-full ">
+        <Conversation >
+          <ConversationContent >
             {messages.map((message, messageIndex) => {
               // console.log("Full Message Object:", message);
               return (
@@ -88,7 +88,7 @@ export default function LangSmithChat({ token }: {token:string}) {
 
                         return (
                           <Fragment key={`${message.id}-${i}`}>
-                            <Message from={message.role}>
+                            <Message from={message.role} >
                               <MessageContent>
                                 {message.role === "assistant" && isLastMessage && status === "streaming" && (
                                   <Shimmer>Generating...</Shimmer>
@@ -118,17 +118,20 @@ export default function LangSmithChat({ token }: {token:string}) {
                         );
                       case 'dynamic-tool':
                         if (part.toolName == "campusResources" && part.output != null && part.output != "null" ){
+                          const isLastMessage =
+                          messageIndex === messages.length - 1;
                           return (
-                            <div>
+                            <div key={`${message.id}-${i}`}>
+                              {message.role === "assistant" && isLastMessage && status === "streaming" && (
+                                  <Shimmer>Generating...</Shimmer>
+                                )}
                               <Ai_CampusResource_toolbox rawOutput={part.output}/>
                             </div>
                         )
                         }
                           ;
                         default:
-                          return (
-                            <Shimmer>Generating...</Shimmer>
-                          );
+                          return null;
                     }
                   })}
                 </Fragment>

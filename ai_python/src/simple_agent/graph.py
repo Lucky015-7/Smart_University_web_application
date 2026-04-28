@@ -33,6 +33,7 @@ model = ChatOllama(
     model=modelName,
     base_url=modelBaseURLollama,
     reasoning=False,
+    temperature=0.5
 )
 
 
@@ -89,7 +90,7 @@ def searchByLocation(
     itemList: list,
     query: str,
     top_n: int = 3,
-    threshold: int = 40,
+    threshold: int = 60,
     weights: dict | None = None,
 ) -> list[dict]:
     """
@@ -124,10 +125,10 @@ def searchByLocation(
 
     if weights is None:
         weights = {
-            "fuzzy_ratio": 0.30,
+            "fuzzy_ratio": 0.50,
             "token_sort": 0.30,
-            "partial_ratio": 0.20,
-            "tfidf": 0.20,
+            "partial_ratio": 0.10,
+            "tfidf": 0.10,
         }
 
     norm_query = normalize(query)
@@ -171,7 +172,7 @@ def searchByName(
     itemList: list,
     query: str,
     top_n: int = 3,
-    threshold: int = 40,
+    threshold: int = 60,
     weights: dict | None = None,
 ) -> list[dict]:
     """
@@ -207,10 +208,10 @@ def searchByName(
 
     if weights is None:
         weights = {
-            "fuzzy_ratio": 0.30,
+            "fuzzy_ratio": 0.50,
             "token_sort": 0.30,
-            "partial_ratio": 0.20,
-            "tfidf": 0.20,
+            "partial_ratio": 0.10,
+            "tfidf": 0.10,
         }
 
     norm_query = normalize(query)
@@ -317,38 +318,10 @@ def campusResources(
 
     config = get_config()
     userjwttoken = config["configurable"].get("userjwttoken")
-
-    print(
-        "-------------------------------------------------------------------------------------"
-    )
-    print(
-        "-------------------------------------------------------------------------------------"
-    )
-    print(
-        "-------------------------------------------------------------------------------------"
-    )
-    print(
-        "-------------------------------------------------------------------------------------"
-    )
-    print(
-        "-------------------------------------------------------------------------------------"
-    )
-    print(
-        "-------------------------------------------------------------------------------------"
-    )
-    print(
-        "-------------------------------------------------------------------------------------"
-    )
-    print(
-        "-------------------------------------------------------------------------------------"
-    )
-    print(
-        "-------------------------------------------------------------------------------------"
-    )
-    print(
-        "-------------------------------------------------------------------------------------"
-    )
-    print(userjwttoken)
+    # print(
+    #     "-------------------------------------------------------------------------------------"
+    # )
+    # print(userjwttoken)
 
     if not userjwttoken:
         return "Error: No Authorization token provided in request configuration."
@@ -381,6 +354,7 @@ def campusResources(
                     "capacity": item["capacity"],
                     "location": item["location"],
                     "status": item["status"],
+                    "imageUrl":item["imageUrl"]
                 }
                 itemList.append(formattedItem)
 
@@ -437,8 +411,19 @@ graph = create_agent(
     model=model,
     tools=[utc_now, calculator, campusResources],
     system_prompt=(
-        "You are a concise assistant. "
-        "Use tools when they add factual precision, then return a direct answer."
+        "You are a concise assistant. Use tools only when they add factual precision.\n"
+        "Present campus resources in user-friendly Markdown (not raw JSON):\n"
+        "- For multiple results: return a Markdown table with headers: Name | Type | Capacity | Location | Status.\n"
+        "- For a single item (user asked for one name): return a Markdown block with bolded labels and values.\n"
+        "- Do NOT display raw JSON unless the user explicitly requests it\n"
+        "- After the resource output include a short one-line human summary.\n"
+        "- If the user asks to see all resources, my bookings, or my tickets, include a 'Links' subsection with these URLs:\n"
+        "  - http://localhost:3000/resources\n"
+        "  - http://localhost:3000/booking\n"
+        "  - http://localhost:3000/tickets\n"
+        "When a user reports a problem, provide brief, safe, and non-technical troubleshooting steps for common user-facing issues (for example: check network connectivity, confirm you're signed in for the software related issues, retry the request, and try simpler queries such as the resource name or location).\n"
+        "If the problem appears serious or the basic steps do not resolve it (service unavailable, repeated authentication failures, data loss, or anything that requires privileged access), advise the user to submit an incident ticket so a human can investigate. Suggest the key details to include in the ticket: description, steps to reproduce, timestamps, and any relevant logs or screenshots.\n"
+        "Never suggest dangerous, illegal, or unsafe actions. Do not include internal chain-of-thought or extra commentary."
     ),
 )
 
