@@ -162,6 +162,27 @@ export default function ViewTicketsClient({
     setPage(1)
   }, [selectedTab])
 
+  // Fetch tickets on mount so initial lists are populated.
+  useEffect(() => {
+    let mounted = true
+    ;(async () => {
+      try {
+        setIsLoading(true)
+        await fetchTickets()
+      } catch (e) {
+        console.error(e)
+      } finally {
+        if (mounted) setIsLoading(false)
+        // Allow the search/category/priority effect to run after initial fetch
+        skipInitialFilterFetch.current = false
+      }
+    })()
+
+    return () => {
+      mounted = false
+    }
+  }, [fetchTickets])
+
   useEffect(() => {
     if (skipInitialFilterFetch.current) {
       skipInitialFilterFetch.current = false

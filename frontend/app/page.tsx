@@ -72,6 +72,7 @@ async function fetchHomeResources(): Promise<Resource[]> {
     }
 
     const { token } = await auth0.getAccessToken()
+    console.log(token)
     const query = new URLSearchParams({ page: '1', limit: '4' })
     const response = await fetch(`${SERVER_API_URL}/api/resources?${query.toString()}`, {
       headers: {

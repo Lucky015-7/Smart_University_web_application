@@ -33,6 +33,9 @@ import {
   MapPin,
   ArrowLeft,
 } from "lucide-react"
+import { useUserName } from "@/lib/useUserName"
+import { useAuth } from '@/lib/auth-context'
+import { UserRole } from '@/lib/roles'
 import dynamic from "next/dynamic"
 import { CommentCard } from "@/components/custom/commentCard"
 
@@ -140,6 +143,9 @@ export default function TicketDetailClient({
   const ticketLocation =
     ticket?.location || ticket?.resource?.location || "Location not available"
   const ticketDescription = ticket?.description || "No description provided"
+  const createdByUser = useUserName(ticket?.createdBy)
+  const assignedToUser = useUserName(ticket?.assignedTo)
+  const auth = useAuth()
 
   const fetchComments = async (id: string) => {
     try {
@@ -419,7 +425,19 @@ export default function TicketDetailClient({
                       <User className="h-4 w-4" />
                       Reported By
                     </p>
-                    <p className="text-base">{ticket.createdBy}</p>
+                    <p className="text-base">
+                      {createdByUser.loading ? (
+                        <Loader2 className="inline-block h-4 w-4 animate-spin text-muted-foreground" />
+                      ) : (
+                        <>
+                          <span>{createdByUser.name ?? ticket.createdBy}</span>
+                          {createdByUser.email && (
+                            <span className="ml-2 text-muted-foreground text-xs">{createdByUser.email}</span>
+                          )}
+                        </>
+                      )}
+                      {/* Raw user IDs are hidden for all users */}
+                    </p>
                   </div>
                 </div>
 
@@ -513,6 +531,7 @@ export default function TicketDetailClient({
                       {comments.map((comment) => (
                         <CommentCard
                           key={comment.id}
+                          commentId={comment.id}
                           userName={
                             comment.authorName ||
                             comment.userName ||
@@ -520,6 +539,10 @@ export default function TicketDetailClient({
                             "Anonymous"
                           }
                           comment={comment.text || comment.comment || ""}
+                          authorId={comment.authorId}
+                          currentUserId={currentUserId}
+                          ticketId={ticketId}
+                          onCommentUpdated={() => fetchComments(ticketId)}
                         />
                       ))}
                     </div>

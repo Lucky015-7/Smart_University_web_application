@@ -70,6 +70,7 @@ interface ResourceData {
 
 export const EditResourceForm = ({ resourceId }: { resourceId: string }) => {
     const [imageFiles, setImageFiles] = useState<FileWithPreview[]>([])
+    const [availabilityWindows, setAvailabilityWindows] = useState<Array<{day:string,startTime:string,endTime:string}>>([])
     const [isLoading, setIsLoading] = useState(false)
     const [isDataLoading, setIsDataLoading] = useState(true)
     const [currentImageUrl, setCurrentImageUrl] = useState<string>("")
@@ -109,6 +110,13 @@ export const EditResourceForm = ({ resourceId }: { resourceId: string }) => {
                     if (data.imageUrl) {
                         setCurrentImageUrl(data.imageUrl)
                     }
+                        if (data.availabilityWindows && Array.isArray(data.availabilityWindows)) {
+                            setAvailabilityWindows(data.availabilityWindows.map((w: any) => ({
+                                day: w.day,
+                                startTime: w.startTime,
+                                endTime: w.endTime,
+                            })))
+                        }
                 } else {
                     toast.error("Failed to load resource")
                     router.back()
@@ -183,6 +191,11 @@ export const EditResourceForm = ({ resourceId }: { resourceId: string }) => {
                 payload.imageUrl = uploadedImageUrl
             } else if (currentImageUrl) {
                 payload.imageUrl = currentImageUrl
+            }
+
+            // Include availability windows (replace existing when provided)
+            if (availabilityWindows) {
+                payload.availabilityWindows = availabilityWindows
             }
 
             // Submit resource to backend
@@ -364,6 +377,75 @@ export const EditResourceForm = ({ resourceId }: { resourceId: string }) => {
                                         <FieldError>{form.formState.errors.description.message}</FieldError>
                                     )}
                                 </FieldGroup>
+                            </FieldSet>
+                        </div>
+
+                        {/* Availability Windows Section */}
+                        <div className="space-y-6">
+                            <FieldSet>
+                                <FieldLegend>Availability Windows</FieldLegend>
+                                <FieldDescription>
+                                    Define weekly availability windows for this resource. When updating, providing this array will replace existing windows.
+                                </FieldDescription>
+                                <FieldSeparator className="my-4" />
+
+                                {availabilityWindows.map((w, idx) => (
+                                    <div key={idx} className="grid grid-cols-3 gap-4 items-end mb-3">
+                                        <div>
+                                            <FieldLabel>Day</FieldLabel>
+                                            <Select value={w.day} onValueChange={(v) => {
+                                                const copy = [...availabilityWindows];
+                                                copy[idx] = { ...copy[idx], day: v };
+                                                setAvailabilityWindows(copy);
+                                            }}>
+                                                <SelectTrigger>
+                                                    <SelectValue />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                    <SelectGroup>
+                                                        <SelectItem value="SUNDAY">Sunday</SelectItem>
+                                                        <SelectItem value="MONDAY">Monday</SelectItem>
+                                                        <SelectItem value="TUESDAY">Tuesday</SelectItem>
+                                                        <SelectItem value="WEDNESDAY">Wednesday</SelectItem>
+                                                        <SelectItem value="THURSDAY">Thursday</SelectItem>
+                                                        <SelectItem value="FRIDAY">Friday</SelectItem>
+                                                        <SelectItem value="SATURDAY">Saturday</SelectItem>
+                                                    </SelectGroup>
+                                                </SelectContent>
+                                            </Select>
+                                        </div>
+
+                                        <div>
+                                            <FieldLabel>Start Time</FieldLabel>
+                                            <Input type="time" value={w.startTime} onChange={(e)=>{
+                                                const copy = [...availabilityWindows];
+                                                copy[idx] = { ...copy[idx], startTime: e.target.value };
+                                                setAvailabilityWindows(copy);
+                                            }} />
+                                        </div>
+
+                                        <div>
+                                            <FieldLabel>End Time</FieldLabel>
+                                            <div className="flex gap-2">
+                                                <Input type="time" value={w.endTime} onChange={(e)=>{
+                                                    const copy = [...availabilityWindows];
+                                                    copy[idx] = { ...copy[idx], endTime: e.target.value };
+                                                    setAvailabilityWindows(copy);
+                                                }} />
+                                                <Button type="button" variant="ghost" onClick={()=>{
+                                                    const copy = availabilityWindows.filter((_,i)=>i!==idx);
+                                                    setAvailabilityWindows(copy);
+                                                }}>Remove</Button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                ))}
+
+                                <div>
+                                    <Button type="button" onClick={() => {
+                                        setAvailabilityWindows([...availabilityWindows, { day: 'MONDAY', startTime: '08:00', endTime: '16:00' }]);
+                                    }}>Add Availability Window</Button>
+                                </div>
                             </FieldSet>
                         </div>
 

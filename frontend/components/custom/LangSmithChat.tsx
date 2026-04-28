@@ -126,7 +126,9 @@ export default function LangSmithChat({ token }: {token:string}) {
                         }
                           ;
                         default:
-                          return null;
+                          return (
+                            <Shimmer>Generating...</Shimmer>
+                          );
                     }
                   })}
                 </Fragment>

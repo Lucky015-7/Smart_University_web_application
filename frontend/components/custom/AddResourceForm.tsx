@@ -59,6 +59,7 @@ type ResourceFormData = z.infer<typeof resourceSchema>;
 
 export const AddResourceForm = () => {
     const [imageFiles, setImageFiles] = useState<FileWithPreview[]>([])
+    const [availabilityWindows, setAvailabilityWindows] = useState<Array<{day:string,startTime:string,endTime:string}>>([])
     const [isLoading, setIsLoading] = useState(false)
     const router = useRouter();
 
@@ -132,6 +133,11 @@ export const AddResourceForm = () => {
 
             if (uploadedImageUrl) {
                 payload.imageUrl = uploadedImageUrl
+            }
+
+            // Include availability windows if any
+            if (availabilityWindows.length > 0) {
+                payload.availabilityWindows = availabilityWindows
             }
 
             // Submit resource to backend
@@ -307,6 +313,75 @@ export const AddResourceForm = () => {
                                         <FieldError>{form.formState.errors.description.message}</FieldError>
                                     )}
                                 </FieldGroup>
+                            </FieldSet>
+                        </div>
+
+                        {/* Availability Windows Section */}
+                        <div className="space-y-6">
+                            <FieldSet>
+                                <FieldLegend>Availability Windows</FieldLegend>
+                                <FieldDescription>
+                                    Define weekly availability windows for this resource. These will be used when creating bookings.
+                                </FieldDescription>
+                                <FieldSeparator className="my-4" />
+
+                                {availabilityWindows.map((w, idx) => (
+                                    <div key={idx} className="grid grid-cols-3 gap-4 items-end mb-3">
+                                        <div>
+                                            <FieldLabel>Day</FieldLabel>
+                                            <Select value={w.day} onValueChange={(v) => {
+                                                const copy = [...availabilityWindows];
+                                                copy[idx] = { ...copy[idx], day: v };
+                                                setAvailabilityWindows(copy);
+                                            }}>
+                                                <SelectTrigger>
+                                                    <SelectValue />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                    <SelectGroup>
+                                                        <SelectItem value="SUNDAY">Sunday</SelectItem>
+                                                        <SelectItem value="MONDAY">Monday</SelectItem>
+                                                        <SelectItem value="TUESDAY">Tuesday</SelectItem>
+                                                        <SelectItem value="WEDNESDAY">Wednesday</SelectItem>
+                                                        <SelectItem value="THURSDAY">Thursday</SelectItem>
+                                                        <SelectItem value="FRIDAY">Friday</SelectItem>
+                                                        <SelectItem value="SATURDAY">Saturday</SelectItem>
+                                                    </SelectGroup>
+                                                </SelectContent>
+                                            </Select>
+                                        </div>
+
+                                        <div>
+                                            <FieldLabel>Start Time</FieldLabel>
+                                            <Input type="time" value={w.startTime} onChange={(e)=>{
+                                                const copy = [...availabilityWindows];
+                                                copy[idx] = { ...copy[idx], startTime: e.target.value };
+                                                setAvailabilityWindows(copy);
+                                            }} />
+                                        </div>
+
+                                        <div>
+                                            <FieldLabel>End Time</FieldLabel>
+                                            <div className="flex gap-2">
+                                                <Input type="time" value={w.endTime} onChange={(e)=>{
+                                                    const copy = [...availabilityWindows];
+                                                    copy[idx] = { ...copy[idx], endTime: e.target.value };
+                                                    setAvailabilityWindows(copy);
+                                                }} />
+                                                <Button type="button" variant="ghost" onClick={()=>{
+                                                    const copy = availabilityWindows.filter((_,i)=>i!==idx);
+                                                    setAvailabilityWindows(copy);
+                                                }}>Remove</Button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                ))}
+
+                                <div>
+                                    <Button type="button" onClick={() => {
+                                        setAvailabilityWindows([...availabilityWindows, { day: 'MONDAY', startTime: '08:00', endTime: '16:00' }]);
+                                    }}>Add Availability Window</Button>
+                                </div>
                             </FieldSet>
                         </div>
 
