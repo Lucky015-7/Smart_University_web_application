@@ -114,6 +114,9 @@ services:
       retries: 800
       start_period: 120s
 
+
+
+# development ------------------------------------------
   frontend:
     build:
       context: ./frontend
@@ -160,6 +163,32 @@ services:
         condition: service_started # to fix the backend crashing issue
 
 
+
+# production ---------------------------------
+  # frontend_build:
+  #   build:
+  #     context: ./frontend
+  #     dockerfile: Dockerfile.build
+  #   image: smart_campus_frontend_build_image
+  #   container_name: smart_campus_frontend_build_container
+  #   env_file:
+  #     - .env
+  #   environment:
+  #     - NEXT_PUBLIC_API_URL=http://localhost:8118
+  #     - INTERNAL_API_URL=http://backend:8080
+  #     - HOSTNAME=0.0.0.0
+  #     - NODE_ENV=production
+  #     - PORT=3000
+  #   ports:
+  #     - "3000:3000"
+  #   restart: unless-stopped
+  #   networks:
+  #     - PAF_project_network
+
+
+
+
+
   ai_python:
     build: 
       context: ./ai_python
@@ -191,6 +220,22 @@ services:
     #   timeout: 10s
     #   retries: 3
     #   start_period: 120s
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 networks:

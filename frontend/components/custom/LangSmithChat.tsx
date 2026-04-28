@@ -41,7 +41,8 @@ export default function LangSmithChat({ token }: {token:string}) {
   const transport = useMemo(
     () =>
       new FixedLangGraphTransport({
-        url: 'http://host.docker.internal:2024',
+        // url: 'http://host.docker.internal:2024',
+        url: 'http://localhost:2024',
         graphId: 'agent',
         headers:{
           'userjwttoken':`Bearer ${token}`
