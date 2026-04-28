@@ -108,16 +108,18 @@ export const ManageUserAddNew = ({ onCreateSuccess }: any) => {
     try {
       const response = await fetch(`/api/auth0/management/users`, {
         method: "POST",
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
       })
 
-      if (response.status == 204 && response.ok) {
+      // Treat any 2xx response as success (201 created, 204 no content, etc.)
+      if (response.ok) {
         toast.success("User added successfully")
         await onCreateSuccess()
       } else {
-        const errorData: Auth0ErrorProp = await response.json()
+        const errorData: Auth0ErrorProp = await response.json().catch(() => ({ message: 'Failed to create user' } as Auth0ErrorProp))
         setError(errorData)
-        toast.error("Error! Can not create user.")
+        toast.error(errorData.message || "Error! Can not create user.")
         throw new Error(errorData.message || "Failed to create user.")
       }
     } catch (err) {

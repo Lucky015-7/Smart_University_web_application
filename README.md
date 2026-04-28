@@ -4,9 +4,13 @@ IT3030 – Programming Applications and Frameworks
 
 
 
-
+### Development
 ```bash
 docker-compose -f docker-compose.yml up --build
+```
+
+### Production
+```bash
 docker-compose -f docker-compose.production.yml up --build
 ```
 

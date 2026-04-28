@@ -1,6 +1,7 @@
 import { Geist_Mono, Inter } from "next/font/google"
 
 import { AIAccessBtn } from "@/components/custom/AIAccessBtn"
+import { AdminAccessFloatingBtn } from '@/components/custom/AdminAccessFloatingBtn'
 import FooterSection from "@/components/custom/FooterSection"
 import NavBarNew from "@/components/custom/NavBarNew"
 import { ThemeProvider } from "@/components/theme-provider"
@@ -44,6 +45,7 @@ export default async function RootLayout({
             <div className="fixed bottom-5 right-5 z-40">
               <AIAccessBtn />
             </div>
+            <AdminAccessFloatingBtn />
             <main className="max-w-8xl mx-auto">{children}</main>
             <footer>
               <FooterSection />
